@@ -19,6 +19,7 @@ public class SecurityConfig {
 
     private final UserRepository userRepository;
 
+    @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
         http
@@ -39,11 +40,6 @@ public class SecurityConfig {
 //                .addFilterBefore(); //todo: add jwt
 
         return http.build();
-    }
-
-    @Bean
-    public UserDetailsService userDetailsService(UserRepository userRepository) {
-        return new ApplicationUserDetailsService(userRepository);
     }
 
     @Bean

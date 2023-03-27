@@ -22,7 +22,7 @@ public class UserRoleService {
     }
 
     public UserRoleEntity getRole(UserRole role) {
-        Optional<UserRoleEntity> userRole = this.userRoleRepository.findByUserRole(role.name());
+        Optional<UserRoleEntity> userRole = this.userRoleRepository.findByUserRole(role);
 
         return userRole.orElseGet(UserRoleEntity::new); //todo: custom exception
     }
