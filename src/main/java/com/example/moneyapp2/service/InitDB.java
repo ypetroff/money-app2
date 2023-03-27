@@ -21,7 +21,7 @@ import java.util.stream.Stream;
 @Service
 public class InitDB {
 
-    private static final String DEFAULT_PASSWORD = "12345";
+    private static final String DEFAULT_PASSWORD = "123456";
 
     private final UserRoleRepository userRoleRepository;
     private final UserRepository userRepository;
