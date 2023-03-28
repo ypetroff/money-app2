@@ -12,6 +12,7 @@ import java.util.Locale;
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 @Entity
 @Table(name = "users")
 public class UserEntity extends BaseEntity {
@@ -24,6 +25,12 @@ public class UserEntity extends BaseEntity {
 
     @Column(name = "email")
     private String email;
+
+    @Column(name = "first-name")
+    private String firstName;
+
+    @Column(name = "last-name")
+    private String lastName;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "users_roles", joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"),

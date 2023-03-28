@@ -2,18 +2,17 @@ package com.example.moneyapp2.security;
 
 import com.example.moneyapp2.model.entity.UserEntity;
 import com.example.moneyapp2.model.entity.UserRoleEntity;
+import com.example.moneyapp2.model.entity.user.MoneyAppUserDetails;
 import com.example.moneyapp2.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -24,7 +23,7 @@ public class ApplicationUserDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         return this.userRepository
-                .findByUsername(username)
+                .findByEmail(username)
                 .map(this::map)
                 .orElseThrow(() ->
                         new UsernameNotFoundException(
@@ -32,7 +31,7 @@ public class ApplicationUserDetailsService implements UserDetailsService {
     }
 
     private UserDetails map(UserEntity userEntity) {
-        return User.builder()
+        return MoneyAppUserDetails.builder()
                 .username(userEntity.getUsername())
                 .password(userEntity.getPassword())
                 .authorities(extractAuthorities(userEntity))
