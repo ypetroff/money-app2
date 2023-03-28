@@ -1,8 +1,8 @@
-package com.example.moneyapp2.security;
+package com.example.moneyapp2.service;
 
-import com.example.moneyapp2.model.entity.UserEntity;
 import com.example.moneyapp2.model.entity.UserRoleEntity;
 import com.example.moneyapp2.model.entity.user.MoneyAppUserDetails;
+import com.example.moneyapp2.model.entity.user.UserEntity;
 import com.example.moneyapp2.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
@@ -14,16 +14,18 @@ import org.springframework.stereotype.Service;
 
 import java.util.Collection;
 
-@Service
 @RequiredArgsConstructor
-public class ApplicationUserDetailsService implements UserDetailsService {
+@Service
+public class MoneyAppUserDetailsService implements UserDetailsService {
 
     private final UserRepository userRepository;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        System.out.println(this.userRepository
+                .findByUsername(username));
         return this.userRepository
-                .findByEmail(username)
+                .findByUsername(username)
                 .map(this::map)
                 .orElseThrow(() ->
                         new UsernameNotFoundException(

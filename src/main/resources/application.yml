@@ -21,5 +21,8 @@ logging:
         SQL: DEBUG
       nodeValue: WARN
     blog: WARN
+    springframework:
+        security: TRACE
 server:
   port: 8080
+

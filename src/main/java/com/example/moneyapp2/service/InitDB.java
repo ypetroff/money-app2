@@ -1,7 +1,7 @@
 package com.example.moneyapp2.service;
 
 import com.example.moneyapp2.model.dto.RegisterDTO;
-import com.example.moneyapp2.model.entity.UserEntity;
+import com.example.moneyapp2.model.entity.user.UserEntity;
 import com.example.moneyapp2.model.entity.UserRoleEntity;
 import com.example.moneyapp2.model.enums.UserRole;
 import com.example.moneyapp2.repository.UserRepository;

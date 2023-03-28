@@ -8,7 +8,6 @@ import java.util.Collection;
 
 @Data
 @RequiredArgsConstructor
-@AllArgsConstructor
 @Builder
 public class MoneyAppUserDetails implements UserDetails {
 
@@ -22,7 +21,7 @@ public class MoneyAppUserDetails implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return null;
+        return this.authorities;
     }
 
     @Override

@@ -1,7 +1,6 @@
 package com.example.moneyapp2.repository;
 
-import com.example.moneyapp2.model.entity.UserEntity;
-import com.example.moneyapp2.security.ApplicationUserDetailsService;
+import com.example.moneyapp2.model.entity.user.UserEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

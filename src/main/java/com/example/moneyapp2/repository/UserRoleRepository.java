@@ -1,6 +1,5 @@
 package com.example.moneyapp2.repository;
 
-import com.example.moneyapp2.model.entity.UserEntity;
 import com.example.moneyapp2.model.entity.UserRoleEntity;
 import com.example.moneyapp2.model.enums.UserRole;
 import org.springframework.data.jpa.repository.JpaRepository;
