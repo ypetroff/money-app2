@@ -13,6 +13,14 @@ public class PasswordsMatcher implements ConstraintValidator<MatchingPasswordAnd
 
     @Override
     public boolean isValid(UserRegisterDTO user, ConstraintValidatorContext context) {
-        return user.getPassword().equals(user.getConfirmPassword());
+
+        if (!user.getPassword().equals(user.getConfirmPassword())) {
+            context.disableDefaultConstraintViolation();
+            context.buildConstraintViolationWithTemplate("Passwords don't match")
+                    .addPropertyNode("confirmPassword").addConstraintViolation();
+            return false;
+        }
+
+        return true;
     }
 }
