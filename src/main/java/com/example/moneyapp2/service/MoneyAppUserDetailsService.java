@@ -22,8 +22,7 @@ public class MoneyAppUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        System.out.println(this.userRepository
-                .findByUsername(username));
+
         return this.userRepository
                 .findByUsername(username)
                 .map(this::map)
