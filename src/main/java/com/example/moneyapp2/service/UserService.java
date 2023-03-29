@@ -1,8 +1,6 @@
 package com.example.moneyapp2.service;
 
-import com.example.moneyapp2.exception.MappingNotSuccessfulException;
 import com.example.moneyapp2.model.dto.UserRegisterDTO;
-import com.example.moneyapp2.model.entity.UserRoleEntity;
 import com.example.moneyapp2.model.entity.user.UserEntity;
 import com.example.moneyapp2.model.enums.UserRole;
 import com.example.moneyapp2.repository.UserRepository;
@@ -26,18 +24,18 @@ public class UserService {
     }
 
     public boolean isEmailFreeToUse(String email) {
-        return this.userRepository.existsByEmailNot(email);
+        return !this.userRepository.existsByEmail(email);
     }
 
     public boolean isUsernameFreeToUse(String username) {
-        return this.userRepository.existsByUsernameNot(username);
+        return !this.userRepository.existsByUsername(username);
     }
 
     public void registerUser(UserRegisterDTO userRegisterDTO) {
         this.userRepository.saveAndFlush(mapToUserEntity(userRegisterDTO));
     }
 
-    private UserEntity mapToUserEntity(UserRegisterDTO userRegisterDTO) throws MappingNotSuccessfulException("Mapping UserRegisterDTO to UserEntity not successful") {
+    private UserEntity mapToUserEntity(UserRegisterDTO userRegisterDTO) {
 
         UserEntity userEntity = this.modelMapper.map(userRegisterDTO, UserEntity.class);
         userEntity.addRole(this.userRoleService.getRole(UserRole.USER));
