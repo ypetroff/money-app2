@@ -1,6 +1,6 @@
 package com.example.moneyapp2.service;
 
-import com.example.moneyapp2.model.dto.RegisterDTO;
+import com.example.moneyapp2.model.dto.UserRegisterDTO;
 import com.example.moneyapp2.model.entity.user.UserEntity;
 import com.example.moneyapp2.model.entity.UserRoleEntity;
 import com.example.moneyapp2.model.enums.UserRole;
@@ -46,8 +46,8 @@ public class InitDB {
 
     private void initUsers() {
         if (this.userRepository.count() == 0) {
-            RegisterDTO admin = initUser("admin");
-            RegisterDTO user = initUser("user");
+            UserRegisterDTO admin = initUser("admin");
+            UserRegisterDTO user = initUser("user");
 
             Stream.of(admin, user)
                     .map(dto -> this.modelMapper.map(dto, UserEntity.class))
@@ -74,9 +74,11 @@ public class InitDB {
         return this.passwordEncoder.encode(password);
     }
 
-    private RegisterDTO initUser(String role) {
-        return RegisterDTO.builder()
+    private UserRegisterDTO initUser(String role) {
+        return UserRegisterDTO.builder()
                 .username(role)
+                .firstName(role)
+                .lastName(role + "ov")
                 .password(DEFAULT_PASSWORD)
                 .email(role + "@example.com")
                 .build();

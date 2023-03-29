@@ -4,8 +4,10 @@ import com.example.moneyapp2.model.enums.UserRole;
 import jakarta.persistence.*;
 import lombok.*;
 
-@Data
-@EqualsAndHashCode(callSuper = true)
+//@Data
+//@EqualsAndHashCode(callSuper = true)
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
