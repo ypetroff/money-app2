@@ -10,8 +10,8 @@ import lombok.*;
 import java.util.ArrayList;
 import java.util.List;
 
-@Data
-@EqualsAndHashCode(callSuper = true)
+@Getter
+@Setter
 @AllArgsConstructor
 @Entity
 @Table(name = "users")
@@ -19,6 +19,7 @@ public class UserEntity extends BaseEntity {
 
     public UserEntity() {
         this.userRoles = new ArrayList<>();
+        this.credits = new ArrayList<>();
     }
 
     @Column(name = "password", nullable = false)

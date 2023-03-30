@@ -15,21 +15,15 @@ import java.util.List;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
+@NoArgsConstructor
 @AllArgsConstructor
 @Entity
 @Table(name = "debit")
 public class DebitEntity extends BaseEntity{
-
-    public DebitEntity() {
-        this.savings = new ArrayList<>();
-    }
 
     @Column(name = "cash", columnDefinition = "DECIMAL default 0")
     private BigDecimal cash;
 
     @Column(name = "card", columnDefinition = "DECIMAL default 0")
     private BigDecimal card;
-
-    @ManyToMany
-    private List<SavingsEntity> savings;
 }

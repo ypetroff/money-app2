@@ -19,8 +19,6 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final UserRoleService userRoleService;
-    private final MoneyAppUserDetailsService userDetailsService;
-    private final JwtService jwtService;
     private final ModelMapper modelMapper;
     private final PasswordEncoder passwordEncoder;
 
@@ -56,6 +54,9 @@ public class UserService {
                 .orElse(false)) {
             throw new UsernameOrPasswordDontMatchException("Username or password don't match");
         }
+    }
 
+    public Long getTotalNumberOfAppUsers() {
+        return this.userRepository.count();
     }
 }

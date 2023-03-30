@@ -22,7 +22,7 @@ logging:
       nodeValue: WARN
     blog: WARN
     springframework:
-        security: TRACE
+        security: DEBUG
 server:
   port: 8080
 
