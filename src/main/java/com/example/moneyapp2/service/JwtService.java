@@ -1,12 +1,11 @@
 package com.example.moneyapp2.service;
 
 import com.example.moneyapp2.exception.ExpiredTokenException;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import io.jsonwebtoken.security.SignatureException;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -37,12 +36,24 @@ public class JwtService {
 
     private Claims extractAllClaims(String token) {
 
+        try {
+
             return Jwts
                     .parserBuilder()
                     .setSigningKey(getSignKey())
                     .build()
                     .parseClaimsJws(token)
                     .getBody();
+        } catch (SignatureException |
+                MalformedJwtException |
+                UnsupportedJwtException |
+                IllegalArgumentException e) {
+
+            throw new BadCredentialsException("Invalid token", e);
+
+        } catch (ExpiredJwtException ex) {
+            throw new ExpiredTokenException("Expired token");
+        }
     }
 
     private Boolean isTokenExpired(String token) {

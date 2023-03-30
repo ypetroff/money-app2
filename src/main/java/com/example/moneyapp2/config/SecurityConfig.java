@@ -1,5 +1,6 @@
 package com.example.moneyapp2.config;
 
+import com.example.moneyapp2.filter.JwtAuthEntryPoint;
 import com.example.moneyapp2.filter.JwtAuthFilter;
 import com.example.moneyapp2.model.entity.user.MoneyAppUserDetails;
 import com.example.moneyapp2.repository.UserRepository;
@@ -28,6 +29,7 @@ public class SecurityConfig {
 
     private final UserDetailsService userDetailsService;
     private final JwtAuthFilter authFilter;
+    private final JwtAuthEntryPoint entryPoint;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -35,6 +37,9 @@ public class SecurityConfig {
                 .cors()
             .and()
                 .csrf().disable()
+                .exceptionHandling()
+                .authenticationEntryPoint(entryPoint)
+            .and()
                 .authorizeHttpRequests()
                 .requestMatchers("/api/auth/**")
                 .permitAll()
