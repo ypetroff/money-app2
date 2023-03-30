@@ -1,6 +1,7 @@
 package com.example.moneyapp2.model.entity.user;
 
 import com.example.moneyapp2.model.entity.BaseEntity;
+import com.example.moneyapp2.model.entity.CreditEntity;
 import com.example.moneyapp2.model.entity.DebitEntity;
 import com.example.moneyapp2.model.entity.UserRoleEntity;
 import jakarta.persistence.*;
@@ -40,6 +41,10 @@ public class UserEntity extends BaseEntity {
 
     @OneToOne
     private DebitEntity debit;
+
+    @ManyToMany
+    private List<CreditEntity> credits;
+
 
     public void addRole(UserRoleEntity role) {
         this.userRoles.add(role);
