@@ -1,5 +1,6 @@
 package com.example.moneyapp2.web;
 
+import com.example.moneyapp2.model.dto.AuthResponse;
 import com.example.moneyapp2.model.dto.UserLoginDTO;
 import com.example.moneyapp2.model.dto.UserRegisterDTO;
 import com.example.moneyapp2.service.JwtService;
@@ -8,7 +9,6 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -34,8 +34,9 @@ public class authController {
     public ResponseEntity<?> authenticateAndCreateToken(@RequestBody UserLoginDTO userLoginDTO) {
 
         this.userService.checkLoginCredentials(userLoginDTO);
+
         String token = this.jwtService.generateToken(userLoginDTO.getUsername());
 
-        return ResponseEntity.ok(token);
+        return ResponseEntity.ok(new AuthResponse(token));
     }
 }

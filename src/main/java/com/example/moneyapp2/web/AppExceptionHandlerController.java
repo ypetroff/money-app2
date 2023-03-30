@@ -30,7 +30,7 @@ public class AppExceptionHandlerController {
     public Map<String, String> handleValidationException(UsernameOrPasswordDontMatchException ex) {
 
         Map<String, String> errorMap = new HashMap<>();
-        errorMap.put("Username was not found or the password was incorrect", ex.getMessage());
+        errorMap.put("Wrong credentials", ex.getMessage());
 
         return errorMap;
     }

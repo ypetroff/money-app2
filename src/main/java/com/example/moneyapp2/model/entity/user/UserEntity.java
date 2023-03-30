@@ -1,6 +1,7 @@
 package com.example.moneyapp2.model.entity.user;
 
 import com.example.moneyapp2.model.entity.BaseEntity;
+import com.example.moneyapp2.model.entity.DebitEntity;
 import com.example.moneyapp2.model.entity.UserRoleEntity;
 import jakarta.persistence.*;
 import lombok.*;
@@ -8,13 +9,16 @@ import lombok.*;
 import java.util.ArrayList;
 import java.util.List;
 
-@EqualsAndHashCode(callSuper = true)
 @Data
-@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @Entity
 @Table(name = "users")
 public class UserEntity extends BaseEntity {
+
+    public UserEntity() {
+        this.userRoles = new ArrayList<>();
+    }
 
     @Column(name = "password", nullable = false)
     private String password;
@@ -32,7 +36,10 @@ public class UserEntity extends BaseEntity {
     private String lastName;
 
     @ManyToMany(fetch = FetchType.EAGER)
-    private List<UserRoleEntity> userRoles = new ArrayList<>();
+    private List<UserRoleEntity> userRoles;
+
+    @OneToOne
+    private DebitEntity debit;
 
     public void addRole(UserRoleEntity role) {
         this.userRoles.add(role);
