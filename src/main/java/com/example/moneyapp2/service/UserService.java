@@ -3,7 +3,7 @@ package com.example.moneyapp2.service;
 import com.example.moneyapp2.exception.UsernameOrPasswordDontMatchException;
 import com.example.moneyapp2.model.dto.UserLoginDTO;
 import com.example.moneyapp2.model.dto.UserRegisterDTO;
-import com.example.moneyapp2.model.entity.user.MoneyAppUserDetails;
+//import com.example.moneyapp2.model.entity.user.MoneyAppUserDetails;
 import com.example.moneyapp2.model.entity.user.UserEntity;
 import com.example.moneyapp2.model.enums.UserRole;
 import com.example.moneyapp2.repository.UserRepository;

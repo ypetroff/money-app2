@@ -49,6 +49,6 @@ public class MoneyAppUserDetailsService implements UserDetailsService {
     }
 
     private GrantedAuthority mapRole(UserRoleEntity userRoleEntity) {
-        return new SimpleGrantedAuthority("ROLE_" + userRoleEntity.getUserRole().name());
+        return new SimpleGrantedAuthority("ROLE_" + userRoleEntity.getUserRole().name()); //"ROLE_" +
     }
 }

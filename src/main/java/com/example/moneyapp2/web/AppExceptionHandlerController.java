@@ -2,10 +2,12 @@ package com.example.moneyapp2.web;
 
 import com.example.moneyapp2.exception.ExpiredTokenException;
 import com.example.moneyapp2.exception.UsernameOrPasswordDontMatchException;
+import io.jsonwebtoken.ExpiredJwtException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -38,7 +40,8 @@ public class AppExceptionHandlerController {
     }
 
     //@ResponseStatus(HttpStatus.UNAUTHORIZED)
-    @ExceptionHandler(ExpiredTokenException.class)
+    @ExceptionHandler({ExpiredJwtException.class, ExpiredTokenException.class} )
+    @ResponseBody
     public ResponseEntity<?> handleExpiredTokenException(ExpiredTokenException ex) {
 
         Map<String, String> errorMap = new HashMap<>();

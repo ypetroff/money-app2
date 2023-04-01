@@ -3,12 +3,16 @@ package com.example.moneyapp2.web;
 import com.example.moneyapp2.model.dto.AuthResponse;
 import com.example.moneyapp2.model.dto.UserLoginDTO;
 import com.example.moneyapp2.model.dto.UserRegisterDTO;
-import com.example.moneyapp2.service.JwtService;
+import com.example.moneyapp2.service.TokenService;
 import com.example.moneyapp2.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,7 +24,9 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController {
 
     private final UserService userService;
-    private final JwtService jwtService;
+    private final TokenService tokenService;
+    private final AuthenticationManager authenticationManager;
+    private final PasswordEncoder passwordEncoder;
 
     @PostMapping("/register")
     public ResponseEntity<String> registerUser(@RequestBody @Valid UserRegisterDTO userRegisterDTO) {
@@ -33,9 +39,12 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<?> authenticateAndCreateToken(@RequestBody UserLoginDTO userLoginDTO) {
 
-        this.userService.checkLoginCredentials(userLoginDTO);
+        Authentication authentication =
+                this.authenticationManager.authenticate(
+                        new UsernamePasswordAuthenticationToken(
+                                userLoginDTO.getUsername(), userLoginDTO.getPassword()));
 
-        String token = this.jwtService.generateToken(userLoginDTO.getUsername());
+        String token = this.tokenService.generateToken(authentication);
 
         return ResponseEntity.ok(new AuthResponse(token));
     }

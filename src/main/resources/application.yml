@@ -25,4 +25,8 @@ logging:
         security: DEBUG
 server:
   port: 8080
+rsa:
+  private-key: classpath:certs/private.pem #see if there's an issue
+  public-key: classpath:certs/public.pem #see if there's an issue
+
 
