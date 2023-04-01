@@ -3,6 +3,7 @@ package com.example.moneyapp2.config;
 import java.util.List;
 
 import com.example.moneyapp2.service.MoneyAppUserDetailsService;
+import com.nimbusds.jose.JOSEException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -45,7 +46,8 @@ import com.nimbusds.jose.proc.SecurityContext;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    private final RsaKeyProperties jwtConfigProperties;
+    //    private final RsaKeyProperties jwtConfigProperties;
+    private RSAKey rsaKey;
     private final MoneyAppUserDetailsService userDetailsService;
 
     @Bean
@@ -53,13 +55,13 @@ public class SecurityConfig {
         return http
                 .cors(Customizer.withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests( auth -> auth
+                .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("api/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .oauth2ResourceServer(OAuth2ResourceServerConfigurer::jwt)
-                .httpBasic(Customizer.withDefaults())
                 .build();
     }
 
@@ -72,14 +74,19 @@ public class SecurityConfig {
     }
 
     @Bean
-    JwtDecoder jwtDecoder() {
-        return NimbusJwtDecoder.withPublicKey(jwtConfigProperties.publicKey()).build();
+    public JWKSource<SecurityContext> jwkSource() {
+        rsaKey = Jwks.generateRsa();
+        JWKSet jwkSet = new JWKSet(rsaKey);
+        return (jwkSelector, securityContext) -> jwkSelector.select(jwkSet);
     }
 
     @Bean
-    JwtEncoder jwtEncoder() {
-        JWK jwk = new RSAKey.Builder(jwtConfigProperties.publicKey()).privateKey(jwtConfigProperties.privateKey()).build();
-        JWKSource<SecurityContext> jwks = new ImmutableJWKSet<>(new JWKSet(jwk));
+    JwtDecoder jwtDecoder() throws JOSEException {
+        return NimbusJwtDecoder.withPublicKey(rsaKey.toRSAPublicKey()).build();
+    }
+
+    @Bean
+    JwtEncoder jwtEncoder(JWKSource<SecurityContext> jwks) {
         return new NimbusJwtEncoder(jwks);
     }
 

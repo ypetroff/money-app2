@@ -1,6 +1,7 @@
 package com.example.moneyapp2.service;
 
 import com.example.moneyapp2.exception.UsernameOrPasswordDontMatchException;
+import com.example.moneyapp2.model.dto.UserInfoDTO;
 import com.example.moneyapp2.model.dto.UserLoginDTO;
 import com.example.moneyapp2.model.dto.UserRegisterDTO;
 //import com.example.moneyapp2.model.entity.user.MoneyAppUserDetails;
@@ -58,5 +59,9 @@ public class UserService {
 
     public Long getTotalNumberOfAppUsers() {
         return this.userRepository.count();
+    }
+
+    public List<UserInfoDTO> getAllAppUsers() {
+        //todo:
     }
 }
