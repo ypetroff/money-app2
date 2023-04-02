@@ -9,7 +9,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class UserProfileDTO {
+public class UpdatedUserProfileDTO {
 
     private String username;
 
@@ -20,4 +20,6 @@ public class UserProfileDTO {
     private String lastName;
 
     private List<String> userRoles;
+
+    private String token;
 }

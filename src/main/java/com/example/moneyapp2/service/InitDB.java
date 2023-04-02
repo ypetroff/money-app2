@@ -24,12 +24,9 @@ public class InitDB {
 
     private final UserRoleService userRoleService;
     private final UserService userService;
-
     private final ExpenseCategoryService expenseCategoryService;
-
     private final ExpenseService expenseService;
     private final ModelMapper modelMapper;
-
     private final PasswordEncoder passwordEncoder;
 
     @PostConstruct

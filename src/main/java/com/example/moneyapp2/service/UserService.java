@@ -9,6 +9,9 @@ import com.example.moneyapp2.model.enums.UserRole;
 import com.example.moneyapp2.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -24,13 +27,12 @@ public class UserService {
     private final ModelMapper modelMapper;
     private final PasswordEncoder passwordEncoder;
 
+    private final AuthenticationManager authenticationManager;
+
     public boolean isUserRepositoryEmpty() {
         return this.userRepository.count() == 0;
     }
 
-    public void saveUserToDB(UserEntity user) {
-        this.userRepository.saveAndFlush(user);
-    }
 
     public boolean isEmailFreeToUse(String email) {
         return !this.userRepository.existsByEmail(email);
@@ -51,6 +53,26 @@ public class UserService {
         userEntity.setPassword(passwordEncoder.encode(userEntity.getPassword()));
 
         return userEntity;
+    }
+
+    public UserProfileDTO updateUsername(String currentUsername, String newUsername) {
+
+        if (!isUsernameFreeToUse(newUsername)) {
+            throw new UsernameAlreadyTaken(String.format("Username %s is already taken!", newUsername));
+        }
+
+        UserEntity entity = this.userRepository.findByUsername(currentUsername)
+                .orElseThrow(() -> new NoAvailableDataException("User not found, based on principal username for user update"));
+
+        entity.setUsername(newUsername);
+
+        this.userRepository.saveAndFlush(entity);
+
+        return provideUserProfileData(newUsername);
+    }
+
+    public void saveUserToDB(UserEntity user) {
+        this.userRepository.saveAndFlush(user);
     }
 
     public Long getTotalNumberOfAppUsers() {
@@ -99,28 +121,23 @@ public class UserService {
         UserEntity entity = this.userRepository.findByUsername(username)
                 .orElseThrow(() -> new NoAvailableDataException("User not found, based on principal username for user profile"));
 
-//        return UserProfileDTO.builder()
-//                .username(entity.getUsername())
-//                .email(entity.getEmail())
-//                .firstName()
-//                .build();
-
         return this.modelMapper.map(entity, UserProfileDTO.class);
     }
 
-    public UserProfileDTO updateUsername(String currentUsername, String newUsername) {
+    private UpdatedUserProfileDTO provideUpdatedUserProfileData(String username) {
 
-        if(!isUsernameFreeToUse(newUsername)) {
-            throw new UsernameAlreadyTaken(String.format("Username %s is already taken!", newUsername));
-        }
+        UserEntity entity = this.userRepository.findByUsername(username)
+                .orElseThrow(() -> new NoAvailableDataException("User not found, based on principal username for user profile"));
 
-        UserEntity entity = this.userRepository.findByUsername(currentUsername)
-                .orElseThrow(() -> new NoAvailableDataException("User not found, based on principal username for user update"));
+        return this.modelMapper.map(entity, UpdatedUserProfileDTO.class);
+    }
 
-        entity.setUsername(newUsername);
 
-        this.userRepository.saveAndFlush(entity);
+    public Authentication authenticateUser(String username, String password) {
 
-        return provideUserProfileData(newUsername);
+        return this.authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(username, password));
+
+
     }
 }
