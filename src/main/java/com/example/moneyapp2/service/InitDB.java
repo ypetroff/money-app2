@@ -1,6 +1,6 @@
 package com.example.moneyapp2.service;
 
-import com.example.moneyapp2.model.dto.UserRegisterDTO;
+import com.example.moneyapp2.model.dto.user.UserRegisterDTO;
 import com.example.moneyapp2.model.entity.user.UserEntity;
 import com.example.moneyapp2.model.entity.UserRoleEntity;
 import com.example.moneyapp2.model.enums.ExpenseCategory;
@@ -98,6 +98,10 @@ public class InitDB {
     }
 
     private void initDemoExpenses() {
-        //todo: init
+
+        if(this.expenseService.isExpenseRepositoryEmpty()) {
+            //todo: init
+        }
+
     }
 }

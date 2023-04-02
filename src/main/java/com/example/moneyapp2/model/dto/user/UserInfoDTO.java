@@ -1,4 +1,4 @@
-package com.example.moneyapp2.model.dto;
+package com.example.moneyapp2.model.dto.user;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -15,8 +15,8 @@ import java.util.List;
 public class UserInfoDTO {
 
     private Long id;
-    private BigDecimal totalFunds;
-    private BigDecimal totalDebt;
+    private BigDecimal userDebit;
+    private BigDecimal userCredit;
 
     private List<String> roles;
 }

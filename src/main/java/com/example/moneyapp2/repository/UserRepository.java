@@ -19,15 +19,23 @@ public interface UserRepository extends JpaRepository<UserEntity, Long> {
 
     @Query("""
             SELECT SUM(d.cash) FROM UserEntity u
-            JOIN DebitEntity d
-            WHERE u.debit.id = d.id
+            JOIN  u.debit d
+            WHERE u.id = :id
             """)
     Optional<BigDecimal> userCashSum(Long id);
 
+
     @Query("""
             SELECT SUM(d.card) FROM UserEntity u
-            JOIN DebitEntity d
-            WHERE u.debit.id = d.id
+            JOIN  u.debit d
+            WHERE u.id = :id
             """)
     Optional<BigDecimal> userCardSum(Long id);
+
+    @Query("""
+            SELECT SUM(c.amount) FROM UserEntity u
+            JOIN u.credits c
+            WHERE u.id = :id
+                        """)
+    Optional<BigDecimal> findCreditsAmountById(Long id);
 }

@@ -1,22 +1,21 @@
 package com.example.moneyapp2.service;
 
 import com.example.moneyapp2.exception.UsernameOrPasswordDontMatchException;
-import com.example.moneyapp2.model.dto.UserInfoDTO;
-import com.example.moneyapp2.model.dto.UserLoginDTO;
-import com.example.moneyapp2.model.dto.UserRegisterDTO;
+import com.example.moneyapp2.model.dto.user.UserForAdminPanelDTO;
+import com.example.moneyapp2.model.dto.user.UserInfoDTO;
+import com.example.moneyapp2.model.dto.user.UserLoginDTO;
+import com.example.moneyapp2.model.dto.user.UserRegisterDTO;
 //import com.example.moneyapp2.model.entity.user.MoneyAppUserDetails;
 import com.example.moneyapp2.model.entity.user.UserEntity;
 import com.example.moneyapp2.model.enums.UserRole;
 import com.example.moneyapp2.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
@@ -71,14 +70,16 @@ public class UserService {
 
     public List<UserInfoDTO> getAllAppUsers() {
 
-        this.userRepository.findAll().stream().map()
+        return this.userRepository.findAll().stream().map(this::mapUserEntityToUserInfoDTO).toList();
     }
 
     private UserInfoDTO mapUserEntityToUserInfoDTO(UserEntity user) {
 
-        BigDecimal userTotalCash = this.userRepository.userCashSum(user.getId())
+        BigDecimal userTotalCashFunds = this.userRepository.userCashSum(user.getId())
                 .orElse(BigDecimal.ZERO);
         BigDecimal userTotalCardFunds = this.userRepository.userCardSum(user.getId())
+                .orElse(BigDecimal.ZERO);
+        BigDecimal userTotalCredit = this.userRepository.findCreditsAmountById(user.getId())
                 .orElse(BigDecimal.ZERO);
         List<String> roles = user.getUserRoles().stream()
                 .map(role -> role.getUserRole().name())
@@ -86,11 +87,16 @@ public class UserService {
 
         return UserInfoDTO.builder()
                 .id(user.getId())
-                .totalFunds(userTotalCash.add(userTotalCardFunds))
-                .totalDebt()
-                .roles()
+                .userDebit(userTotalCashFunds.add(userTotalCardFunds))
+                .userCredit(userTotalCredit)
+                .roles(roles)
                 .build();
     }
 
 
+    public List<UserForAdminPanelDTO> getAllUsersForAdminPanel() {
+        return this.userRepository.findAll().stream()
+                .map(u -> this.modelMapper.map(u, UserForAdminPanelDTO.class))
+                .toList();
+    }
 }

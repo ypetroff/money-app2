@@ -15,12 +15,12 @@ public interface DebitRepository extends JpaRepository<DebitEntity, Long> {
             SELECT SUM(d.cash)
             FROM DebitEntity d
             """)
-    Optional<BigDecimal> allCashSum();
+    Optional<BigDecimal> allDebitCashSum();
 
     @Query("""
             SELECT SUM(d.card)
             FROM DebitEntity d
             """)
-    Optional<BigDecimal> allCardSum();
+    Optional<BigDecimal> allDebitCardSum();
 
 }

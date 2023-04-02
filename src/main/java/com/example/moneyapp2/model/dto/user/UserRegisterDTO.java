@@ -1,4 +1,4 @@
-package com.example.moneyapp2.model.dto;
+package com.example.moneyapp2.model.dto.user;
 
 import com.example.moneyapp2.validation.matchingPasswordAndConfirmPassword.MatchingPasswordAndConfirmPassword;
 import com.example.moneyapp2.validation.uniqueEmail.UniqueEmail;

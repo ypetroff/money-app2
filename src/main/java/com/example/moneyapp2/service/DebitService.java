@@ -1,6 +1,5 @@
 package com.example.moneyapp2.service;
 
-import com.example.moneyapp2.exception.NoAvailableDataException;
 import com.example.moneyapp2.repository.DebitRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -13,17 +12,17 @@ public class DebitService {
 
     private final DebitRepository debitRepository;
 
-    public BigDecimal getTotalFundsInTheApp() {
+    public BigDecimal getTotalDebitInTheApp() {
         return getTotalCash().add(getTotalCardFunds());
     }
 
     private BigDecimal getTotalCash() {
-        return this.debitRepository.allCashSum()
+        return this.debitRepository.allDebitCashSum()
                 .orElse(BigDecimal.ZERO);
     }
 
     private BigDecimal getTotalCardFunds() {
-        return this.debitRepository.allCardSum()
+        return this.debitRepository.allDebitCardSum()
                 .orElse(BigDecimal.ZERO);
     }
 

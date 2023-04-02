@@ -39,7 +39,7 @@ public class AppExceptionHandlerController {
         return errorMap;
     }
 
-    //@ResponseStatus(HttpStatus.UNAUTHORIZED)
+
     @ExceptionHandler({ExpiredJwtException.class, ExpiredTokenException.class} )
     @ResponseBody
     public ResponseEntity<?> handleExpiredTokenException(ExpiredTokenException ex) {

@@ -1,9 +1,10 @@
 package com.example.moneyapp2.model.dto;
 
+import com.example.moneyapp2.model.dto.user.UserForAdminPanelDTO;
+import com.example.moneyapp2.model.dto.user.UserInfoDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -20,11 +21,11 @@ public class AdminDashboardDTO {
 
     private Long totalUsersCount;
 
-    private BigDecimal totalFundsOnTheApp;
+    private BigDecimal totalDebitOnTheApp;
 
-    private BigDecimal totalDebtOnTheApp;
+    private BigDecimal totalCreditOnTheApp;
 
-    private List<UserInfoDTO> users;
+    private List<UserForAdminPanelDTO> users;
 
 
 }

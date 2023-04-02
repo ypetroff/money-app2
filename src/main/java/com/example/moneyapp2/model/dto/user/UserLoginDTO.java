@@ -1,4 +1,4 @@
-package com.example.moneyapp2.model.dto;
+package com.example.moneyapp2.model.dto.user;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

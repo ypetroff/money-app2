@@ -1,8 +1,8 @@
 package com.example.moneyapp2.web;
 
 import com.example.moneyapp2.model.dto.AuthResponse;
-import com.example.moneyapp2.model.dto.UserLoginDTO;
-import com.example.moneyapp2.model.dto.UserRegisterDTO;
+import com.example.moneyapp2.model.dto.user.UserLoginDTO;
+import com.example.moneyapp2.model.dto.user.UserRegisterDTO;
 import com.example.moneyapp2.service.TokenService;
 import com.example.moneyapp2.service.UserService;
 import jakarta.validation.Valid;

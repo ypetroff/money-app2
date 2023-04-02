@@ -1,6 +1,6 @@
 package com.example.moneyapp2.validation.matchingPasswordAndConfirmPassword;
 
-import com.example.moneyapp2.model.dto.UserRegisterDTO;
+import com.example.moneyapp2.model.dto.user.UserRegisterDTO;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 
