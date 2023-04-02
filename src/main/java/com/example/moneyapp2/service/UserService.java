@@ -1,10 +1,8 @@
 package com.example.moneyapp2.service;
 
-import com.example.moneyapp2.exception.UsernameOrPasswordDontMatchException;
-import com.example.moneyapp2.model.dto.user.UserForAdminPanelDTO;
-import com.example.moneyapp2.model.dto.user.UserInfoDTO;
-import com.example.moneyapp2.model.dto.user.UserLoginDTO;
-import com.example.moneyapp2.model.dto.user.UserRegisterDTO;
+import com.example.moneyapp2.exception.NoAvailableDataException;
+import com.example.moneyapp2.exception.UsernameAlreadyTaken;
+import com.example.moneyapp2.model.dto.user.*;
 //import com.example.moneyapp2.model.entity.user.MoneyAppUserDetails;
 import com.example.moneyapp2.model.entity.user.UserEntity;
 import com.example.moneyapp2.model.enums.UserRole;
@@ -55,15 +53,6 @@ public class UserService {
         return userEntity;
     }
 
-    public void checkLoginCredentials(UserLoginDTO userLoginDTO) {
-
-        if (!userRepository.findByUsername(userLoginDTO.getUsername())
-                .map(userEntity -> passwordEncoder.matches(userLoginDTO.getPassword(), userEntity.getPassword()))
-                .orElse(false)) {
-            throw new UsernameOrPasswordDontMatchException("Username or password don't match");
-        }
-    }
-
     public Long getTotalNumberOfAppUsers() {
         return this.userRepository.count();
     }
@@ -71,6 +60,14 @@ public class UserService {
     public List<UserInfoDTO> getAllAppUsers() {
 
         return this.userRepository.findAll().stream().map(this::mapUserEntityToUserInfoDTO).toList();
+    }
+
+    public UserInfoDTO provideUserDashboardData(String username) {
+
+        UserEntity user = this.userRepository.findByUsername(username)
+                .orElseThrow(() -> new NoAvailableDataException("User not found, based on principal username for user dashboard"));
+
+        return mapUserEntityToUserInfoDTO(user);
     }
 
     private UserInfoDTO mapUserEntityToUserInfoDTO(UserEntity user) {
@@ -81,15 +78,12 @@ public class UserService {
                 .orElse(BigDecimal.ZERO);
         BigDecimal userTotalCredit = this.userRepository.findCreditsAmountById(user.getId())
                 .orElse(BigDecimal.ZERO);
-        List<String> roles = user.getUserRoles().stream()
-                .map(role -> role.getUserRole().name())
-                .toList();
 
         return UserInfoDTO.builder()
                 .id(user.getId())
+                .username(user.getUsername())
                 .userDebit(userTotalCashFunds.add(userTotalCardFunds))
                 .userCredit(userTotalCredit)
-                .roles(roles)
                 .build();
     }
 
@@ -98,5 +92,35 @@ public class UserService {
         return this.userRepository.findAll().stream()
                 .map(u -> this.modelMapper.map(u, UserForAdminPanelDTO.class))
                 .toList();
+    }
+
+    public UserProfileDTO provideUserProfileData(String username) {
+
+        UserEntity entity = this.userRepository.findByUsername(username)
+                .orElseThrow(() -> new NoAvailableDataException("User not found, based on principal username for user profile"));
+
+//        return UserProfileDTO.builder()
+//                .username(entity.getUsername())
+//                .email(entity.getEmail())
+//                .firstName()
+//                .build();
+
+        return this.modelMapper.map(entity, UserProfileDTO.class);
+    }
+
+    public UserProfileDTO updateUsername(String currentUsername, String newUsername) {
+
+        if(!isUsernameFreeToUse(newUsername)) {
+            throw new UsernameAlreadyTaken(String.format("Username %s is already taken!", newUsername));
+        }
+
+        UserEntity entity = this.userRepository.findByUsername(currentUsername)
+                .orElseThrow(() -> new NoAvailableDataException("User not found, based on principal username for user update"));
+
+        entity.setUsername(newUsername);
+
+        this.userRepository.saveAndFlush(entity);
+
+        return provideUserProfileData(newUsername);
     }
 }

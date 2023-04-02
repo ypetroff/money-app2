@@ -16,7 +16,7 @@ public class AdminService {
     private final DebitService debitService;
     private final CreditService creditService;
 
-    public AdminDashboardDTO provideDashboardData() {
+    public AdminDashboardDTO provideAdminDashboardData() {
 
         Long totalNumberOfAppUsers = this.userService.getTotalNumberOfAppUsers();
         BigDecimal totalFundsInTheApp = this.debitService.getTotalDebitInTheApp();

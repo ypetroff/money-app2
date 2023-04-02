@@ -15,8 +15,11 @@ import java.util.List;
 public class UserInfoDTO {
 
     private Long id;
+
+    private String username;
+
     private BigDecimal userDebit;
+
     private BigDecimal userCredit;
 
-    private List<String> roles;
 }
