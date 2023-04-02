@@ -3,9 +3,8 @@ package com.example.moneyapp2.service;
 import com.example.moneyapp2.model.dto.UserRegisterDTO;
 import com.example.moneyapp2.model.entity.user.UserEntity;
 import com.example.moneyapp2.model.entity.UserRoleEntity;
+import com.example.moneyapp2.model.enums.ExpenseCategory;
 import com.example.moneyapp2.model.enums.UserRole;
-import com.example.moneyapp2.repository.UserRepository;
-import com.example.moneyapp2.repository.UserRoleRepository;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -23,10 +22,12 @@ public class InitDB {
 
     private static final String DEFAULT_PASSWORD = "12345";
 
-    private final UserRoleRepository userRoleRepository;
-    private final UserRepository userRepository;
     private final UserRoleService userRoleService;
     private final UserService userService;
+
+    private final ExpenseCategoryService expenseCategoryService;
+
+    private final ExpenseService expenseService;
     private final ModelMapper modelMapper;
 
     private final PasswordEncoder passwordEncoder;
@@ -34,18 +35,22 @@ public class InitDB {
     @PostConstruct
     public void initTestUsersWithRolesAdminAndUser() {
         initRoles();
-        initUsers();
+        initDemoUsers();
+        initExpenseCategories();
+        initDemoExpenses();
     }
 
     private void initRoles() {
-        if(this.userRoleRepository.count() == 0) {
+
+        if(this.userRoleService.isUserRoleRepositoryEmpty()) {
             Arrays.stream(UserRole.values())
                     .forEach(this.userRoleService::saveRoleToDB);
         }
     }
 
-    private void initUsers() {
-        if (this.userRepository.count() == 0) {
+    private void initDemoUsers() {
+
+        if (this.userService.isUserRepositoryEmpty()) {
             UserRegisterDTO admin = initUser("admin");
             UserRegisterDTO user = initUser("user");
 
@@ -82,5 +87,17 @@ public class InitDB {
                 .password(DEFAULT_PASSWORD)
                 .email(role + "@example.com")
                 .build();
+    }
+
+    private void initExpenseCategories() {
+
+        if(this.expenseCategoryService.isExpenseCategoryRepositoryEmpty()) {
+            Arrays.stream(ExpenseCategory.values())
+                    .forEach(this.expenseCategoryService::saveCategoryToDB);
+        }
+    }
+
+    private void initDemoExpenses() {
+        //todo: init
     }
 }

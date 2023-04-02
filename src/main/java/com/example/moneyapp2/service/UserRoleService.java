@@ -14,10 +14,15 @@ public class UserRoleService {
 
     private final UserRoleRepository userRoleRepository;
 
+    public  boolean isUserRoleRepositoryEmpty() {
+        return this.userRoleRepository.count() == 0;
+    }
+
     public void saveRoleToDB(UserRole role) {
 
         UserRoleEntity entity = new UserRoleEntity();
         entity.setUserRole(role);
+
         this.userRoleRepository.saveAndFlush(entity);
     }
 

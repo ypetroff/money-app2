@@ -14,6 +14,10 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.Optional;
+
 @RequiredArgsConstructor
 @Service
 public class UserService {
@@ -22,6 +26,10 @@ public class UserService {
     private final UserRoleService userRoleService;
     private final ModelMapper modelMapper;
     private final PasswordEncoder passwordEncoder;
+
+    public boolean isUserRepositoryEmpty() {
+        return this.userRepository.count() == 0;
+    }
 
     public void saveUserToDB(UserEntity user) {
         this.userRepository.saveAndFlush(user);
@@ -62,6 +70,27 @@ public class UserService {
     }
 
     public List<UserInfoDTO> getAllAppUsers() {
-        //todo:
+
+        this.userRepository.findAll().stream().map()
     }
+
+    private UserInfoDTO mapUserEntityToUserInfoDTO(UserEntity user) {
+
+        BigDecimal userTotalCash = this.userRepository.userCashSum(user.getId())
+                .orElse(BigDecimal.ZERO);
+        BigDecimal userTotalCardFunds = this.userRepository.userCardSum(user.getId())
+                .orElse(BigDecimal.ZERO);
+        List<String> roles = user.getUserRoles().stream()
+                .map(role -> role.getUserRole().name())
+                .toList();
+
+        return UserInfoDTO.builder()
+                .id(user.getId())
+                .totalFunds(userTotalCash.add(userTotalCardFunds))
+                .totalDebt()
+                .roles()
+                .build();
+    }
+
+
 }
