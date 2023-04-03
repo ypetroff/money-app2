@@ -1,9 +1,6 @@
 package com.example.moneyapp2.web;
 
-import com.example.moneyapp2.exception.ExpiredTokenException;
-import com.example.moneyapp2.exception.NoAvailableDataException;
-import com.example.moneyapp2.exception.UsernameAlreadyTaken;
-import com.example.moneyapp2.exception.UsernameOrPasswordDontMatchException;
+import com.example.moneyapp2.exception.*;
 import io.jsonwebtoken.ExpiredJwtException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -65,6 +62,16 @@ public class AppExceptionHandlerController {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(NoAvailableDataException.class)
     public Map<String, String> handleMissingData(NoAvailableDataException ex) {
+
+        Map<String, String> errorMap = new HashMap<>();
+        errorMap.put("Error message", ex.getMessage());
+
+        return errorMap;
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(WrongPasswordException.class)
+    public Map<String, String> handleWrongPassword(WrongPasswordException ex) {
 
         Map<String, String> errorMap = new HashMap<>();
         errorMap.put("Error message", ex.getMessage());

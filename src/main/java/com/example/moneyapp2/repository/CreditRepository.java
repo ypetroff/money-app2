@@ -17,4 +17,12 @@ public interface CreditRepository extends JpaRepository<CreditEntity, Long> {
             """)
     Optional<BigDecimal> allCreditSum();
 
+    @Query("""
+            SELECT SUM(c.amount)
+            FROM CreditEntity c
+            JOIN c.debtors u
+            WHERE u.username = :username
+            """)
+    Optional<BigDecimal> findTotalAmountByDebtorsUsername(String username);
+
 }

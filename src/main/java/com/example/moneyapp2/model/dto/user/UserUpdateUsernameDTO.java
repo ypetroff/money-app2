@@ -12,7 +12,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class UsernameUpdateDTO {
+public class UserUpdateUsernameDTO {
 
     @UniqueUsername
     @NotEmpty

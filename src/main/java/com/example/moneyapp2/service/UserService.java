@@ -2,6 +2,7 @@ package com.example.moneyapp2.service;
 
 import com.example.moneyapp2.exception.NoAvailableDataException;
 import com.example.moneyapp2.model.dto.user.UserForAdminPanelDTO;
+import com.example.moneyapp2.model.dto.user.UserForServicesDTO;
 import com.example.moneyapp2.model.dto.user.UserInfoDTO;
 import com.example.moneyapp2.model.dto.user.UserRegisterDTO;
 import com.example.moneyapp2.model.entity.user.UserEntity;
@@ -50,22 +51,24 @@ public class UserService {
         return userEntity;
     }
 
-    public void saveUserToDB(UserEntity user) {
+    public void saveUserDtoToDB(UserForServicesDTO user) {
+
+        saveEntityUserToDB(this.modelMapper.map(user, UserEntity.class));
+    }
+
+    public void saveEntityUserToDB(UserEntity user) {
         this.userRepository.saveAndFlush(user);
     }
 
-    public UserEntity findUser(String username) {
-        return this.userRepository.findByUsername(username)
+    public UserForServicesDTO findUser(String username) {
+        UserEntity entity = this.userRepository.findByUsername(username)
                 .orElseThrow(() -> new NoAvailableDataException("User not found, based on principal username"));
+
+        return this.modelMapper.map(entity, UserForServicesDTO.class);
     }
 
     public Long getTotalNumberOfAppUsers() {
         return this.userRepository.count();
-    }
-
-    public List<UserInfoDTO> getAllAppUsers() {
-
-        return this.userRepository.findAll().stream().map(this::mapUserEntityToUserInfoDTO).toList();
     }
 
     public UserInfoDTO provideUserDashboardData(String username) {
@@ -99,4 +102,6 @@ public class UserService {
                 .map(u -> this.modelMapper.map(u, UserForAdminPanelDTO.class))
                 .toList();
     }
+
+
 }

@@ -23,4 +23,5 @@ public interface DebitRepository extends JpaRepository<DebitEntity, Long> {
             """)
     Optional<BigDecimal> allDebitCardSum();
 
+    Optional<DebitEntity> findByOwnerUsername(String username);
 }

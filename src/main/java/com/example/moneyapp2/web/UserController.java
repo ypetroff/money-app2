@@ -2,11 +2,11 @@ package com.example.moneyapp2.web;
 
 import com.example.moneyapp2.model.dto.AuthResponse;
 import com.example.moneyapp2.model.dto.user.UserProfileDTO;
-import com.example.moneyapp2.model.dto.user.UsernameUpdateDTO;
-import com.example.moneyapp2.model.dto.user.UsernameUpdateEmailDTO;
+import com.example.moneyapp2.model.dto.user.UserUpdatePasswordDTO;
+import com.example.moneyapp2.model.dto.user.UserUpdateUsernameDTO;
+import com.example.moneyapp2.model.dto.user.UserUpdateEmailDTO;
 import com.example.moneyapp2.service.TokenService;
 import com.example.moneyapp2.service.UserProfileService;
-import com.example.moneyapp2.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -34,7 +34,7 @@ public class UserController {
     }
 
     @PatchMapping("/updateUsername")
-    public ResponseEntity<?> updateUsername(@Valid @RequestBody UsernameUpdateDTO updateUsernameDTO, Principal principal) {
+    public ResponseEntity<?> updateUsername(@Valid @RequestBody UserUpdateUsernameDTO updateUsernameDTO, Principal principal) {
 
         UserProfileDTO updatedUser = this.userProfileService.updateUsername(principal.getName(), updateUsernameDTO.getUsername());
         Authentication authentication = this.userProfileService.authenticateUser(updatedUser.getUsername(), updateUsernameDTO.getPassword());
@@ -44,10 +44,18 @@ public class UserController {
     }
 
     @PatchMapping("/updateEmail")
-    public ResponseEntity<?> updateEmail(@Valid @RequestBody UsernameUpdateEmailDTO updateEmailDTO, Principal principal) {
+    public ResponseEntity<?> updateEmail(@Valid @RequestBody UserUpdateEmailDTO updateEmailDTO, Principal principal) {
 
         this.userProfileService.updateEmail(principal.getName(), updateEmailDTO.getEmail());
 
         return new ResponseEntity<>("Changed email", HttpStatus.OK);
+    }
+
+    @PatchMapping("/updatePassword")
+    public ResponseEntity<?> updatePassword(@Valid @RequestBody UserUpdatePasswordDTO updatePasswordDTO, Principal principal) {
+
+        this.userProfileService.updatePassword(updatePasswordDTO, principal.getName());
+
+        return new ResponseEntity<>("Changed password", HttpStatus.OK);
     }
 }

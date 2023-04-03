@@ -48,6 +48,7 @@ public class InitDB {
     private void initDemoUsers() {
 
         if (this.userService.isUserRepositoryEmpty()) {
+
             UserRegisterDTO admin = initUser("admin");
             UserRegisterDTO user = initUser("user");
 
@@ -55,7 +56,7 @@ public class InitDB {
                     .map(dto -> this.modelMapper.map(dto, UserEntity.class))
                     .peek(u -> u.setPassword(encodePassword(u.getPassword())))
                     .peek(this::addRole)
-                    .forEach(this.userService::saveUserToDB);
+                    .forEach(this.userService::saveEntityUserToDB);
         }
     }
 
