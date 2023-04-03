@@ -1,6 +1,8 @@
 package com.example.moneyapp2.web;
 
 import com.example.moneyapp2.exception.ExpiredTokenException;
+import com.example.moneyapp2.exception.NoAvailableDataException;
+import com.example.moneyapp2.exception.UsernameAlreadyTaken;
 import com.example.moneyapp2.exception.UsernameOrPasswordDontMatchException;
 import io.jsonwebtoken.ExpiredJwtException;
 import org.springframework.http.HttpStatus;
@@ -49,5 +51,27 @@ public class AppExceptionHandlerController {
 
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorMap);
     }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(UsernameAlreadyTaken.class)
+    public Map<String, String> handleUsernameIsTaken(UsernameAlreadyTaken ex) {
+
+        Map<String, String> errorMap = new HashMap<>();
+        errorMap.put("Error message", ex.getMessage());
+
+        return errorMap;
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(NoAvailableDataException.class)
+    public Map<String, String> handleMissingData(NoAvailableDataException ex) {
+
+        Map<String, String> errorMap = new HashMap<>();
+        errorMap.put("Error message", ex.getMessage());
+
+        return errorMap;
+    }
+
+
 
 }

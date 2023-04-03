@@ -1,5 +1,7 @@
 package com.example.moneyapp2.model.dto.user;
 
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -12,5 +14,6 @@ import lombok.NoArgsConstructor;
 public class UserLoginDTO {
 
     private String username;
+
     private String password;
 }

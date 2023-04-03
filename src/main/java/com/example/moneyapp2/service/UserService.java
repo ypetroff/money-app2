@@ -1,17 +1,14 @@
 package com.example.moneyapp2.service;
 
 import com.example.moneyapp2.exception.NoAvailableDataException;
-import com.example.moneyapp2.exception.UsernameAlreadyTaken;
-import com.example.moneyapp2.model.dto.user.*;
-//import com.example.moneyapp2.model.entity.user.MoneyAppUserDetails;
+import com.example.moneyapp2.model.dto.user.UserForAdminPanelDTO;
+import com.example.moneyapp2.model.dto.user.UserInfoDTO;
+import com.example.moneyapp2.model.dto.user.UserRegisterDTO;
 import com.example.moneyapp2.model.entity.user.UserEntity;
 import com.example.moneyapp2.model.enums.UserRole;
 import com.example.moneyapp2.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -26,8 +23,6 @@ public class UserService {
     private final UserRoleService userRoleService;
     private final ModelMapper modelMapper;
     private final PasswordEncoder passwordEncoder;
-
-    private final AuthenticationManager authenticationManager;
 
     public boolean isUserRepositoryEmpty() {
         return this.userRepository.count() == 0;
@@ -55,24 +50,13 @@ public class UserService {
         return userEntity;
     }
 
-    public UserProfileDTO updateUsername(String currentUsername, String newUsername) {
-
-        if (!isUsernameFreeToUse(newUsername)) {
-            throw new UsernameAlreadyTaken(String.format("Username %s is already taken!", newUsername));
-        }
-
-        UserEntity entity = this.userRepository.findByUsername(currentUsername)
-                .orElseThrow(() -> new NoAvailableDataException("User not found, based on principal username for user update"));
-
-        entity.setUsername(newUsername);
-
-        this.userRepository.saveAndFlush(entity);
-
-        return provideUserProfileData(newUsername);
-    }
-
     public void saveUserToDB(UserEntity user) {
         this.userRepository.saveAndFlush(user);
+    }
+
+    public UserEntity findUser(String username) {
+        return this.userRepository.findByUsername(username)
+                .orElseThrow(() -> new NoAvailableDataException("User not found, based on principal username"));
     }
 
     public Long getTotalNumberOfAppUsers() {
@@ -114,30 +98,5 @@ public class UserService {
         return this.userRepository.findAll().stream()
                 .map(u -> this.modelMapper.map(u, UserForAdminPanelDTO.class))
                 .toList();
-    }
-
-    public UserProfileDTO provideUserProfileData(String username) {
-
-        UserEntity entity = this.userRepository.findByUsername(username)
-                .orElseThrow(() -> new NoAvailableDataException("User not found, based on principal username for user profile"));
-
-        return this.modelMapper.map(entity, UserProfileDTO.class);
-    }
-
-    private UpdatedUserProfileDTO provideUpdatedUserProfileData(String username) {
-
-        UserEntity entity = this.userRepository.findByUsername(username)
-                .orElseThrow(() -> new NoAvailableDataException("User not found, based on principal username for user profile"));
-
-        return this.modelMapper.map(entity, UpdatedUserProfileDTO.class);
-    }
-
-
-    public Authentication authenticateUser(String username, String password) {
-
-        return this.authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(username, password));
-
-
     }
 }
