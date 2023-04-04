@@ -81,18 +81,19 @@ public class UserService {
 
     private UserInfoDTO mapUserEntityToUserInfoDTO(UserEntity user) {
 
-        BigDecimal userTotalCashFunds = this.userRepository.userCashSum(user.getId())
+        BigDecimal userTotalIncome = this.userRepository.incomeSum(user.getId())
                 .orElse(BigDecimal.ZERO);
-        BigDecimal userTotalCardFunds = this.userRepository.userCardSum(user.getId())
+        BigDecimal userTotalExpenses = this.userRepository.expensesSum(user.getId())
                 .orElse(BigDecimal.ZERO);
-        BigDecimal userTotalCredit = this.userRepository.findCreditsAmountById(user.getId())
+        BigDecimal userTotalSavings = this.userRepository.savingsSum(user.getId())
                 .orElse(BigDecimal.ZERO);
 
         return UserInfoDTO.builder()
                 .id(user.getId())
                 .username(user.getUsername())
-                .userDebit(userTotalCashFunds.add(userTotalCardFunds))
-                .userCredit(userTotalCredit)
+                .income(userTotalIncome)
+                .expenses(userTotalExpenses)
+                .savings(userTotalSavings)
                 .build();
     }
 

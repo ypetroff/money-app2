@@ -1,4 +1,4 @@
-package com.example.moneyapp2.model.dto;
+package com.example.moneyapp2.model.dto.expense;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,9 +11,9 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class AccountDashboardDTO {
+public class ExpenseInfoDTO {
 
-    private BigDecimal income;
-
-    private BigDecimal expenses;
+    private Long id;
+    private String name;
+    private BigDecimal totalPrice;
 }

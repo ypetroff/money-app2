@@ -22,7 +22,6 @@ import java.security.Principal;
 public class UserController {
 
     private final UserProfileService userProfileService;
-    private final TokenService tokenService;
 
     @GetMapping("/profile")
     public ResponseEntity<?> userProfile(Principal principal) {
@@ -31,31 +30,5 @@ public class UserController {
 
 
         return ResponseEntity.ok(profileInfo);
-    }
-
-    @PatchMapping("/updateUsername")
-    public ResponseEntity<?> updateUsername(@Valid @RequestBody UserUpdateUsernameDTO updateUsernameDTO, Principal principal) {
-
-        UserProfileDTO updatedUser = this.userProfileService.updateUsername(principal.getName(), updateUsernameDTO.getUsername());
-        Authentication authentication = this.userProfileService.authenticateUser(updatedUser.getUsername(), updateUsernameDTO.getPassword());
-        String token = this.tokenService.generateToken(authentication);
-
-        return ResponseEntity.ok(new AuthResponse(token));
-    }
-
-    @PatchMapping("/updateEmail")
-    public ResponseEntity<?> updateEmail(@Valid @RequestBody UserUpdateEmailDTO updateEmailDTO, Principal principal) {
-
-        this.userProfileService.updateEmail(principal.getName(), updateEmailDTO.getEmail());
-
-        return new ResponseEntity<>("Changed email", HttpStatus.OK);
-    }
-
-    @PatchMapping("/updatePassword")
-    public ResponseEntity<?> updatePassword(@Valid @RequestBody UserUpdatePasswordDTO updatePasswordDTO, Principal principal) {
-
-        this.userProfileService.updatePassword(updatePasswordDTO, principal.getName());
-
-        return new ResponseEntity<>("Changed password", HttpStatus.OK);
     }
 }

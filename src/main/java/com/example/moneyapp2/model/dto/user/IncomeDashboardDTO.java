@@ -1,27 +1,21 @@
 package com.example.moneyapp2.model.dto.user;
 
+import com.example.moneyapp2.model.entity.IncomeCategoryEntity;
+import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
-import java.util.List;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
-public class UserInfoDTO {
+public class IncomeDashboardDTO {
 
     private Long id;
 
-    private String username;
+    private BigDecimal amount;
 
-    private BigDecimal income;
-
-    private BigDecimal expenses;
-
-    private BigDecimal savings;
-
+    private String incomeCategory;
 }

@@ -13,20 +13,20 @@ import java.util.List;
 public class AdminService {
 
     private final UserService userService;
-    private final DebitService debitService;
-    private final CreditService creditService;
+    private final IncomeService incomeService;
+    private final ExpenseService expenseService;
 
     public AdminDashboardDTO provideAdminDashboardData() {
 
         Long totalNumberOfAppUsers = this.userService.getTotalNumberOfAppUsers();
-        BigDecimal totalFundsInTheApp = this.debitService.getTotalDebitInTheApp();
-        BigDecimal totalCreditInTheApp = this.creditService.getTotalCreditInTheApp();
+        BigDecimal totalFundsOnTheApp = this.incomeService.getTotalIncomeOnTheApp();
+        BigDecimal totalExpensesOnTheApp = this.expenseService.getTotalExpenseOnTeApp();
         List<UserForAdminPanelDTO> users = this.userService.getAllUsersForAdminPanel();
 
         return AdminDashboardDTO.builder()
                 .totalUsersCount(totalNumberOfAppUsers)
-                .totalDebitOnTheApp(totalFundsInTheApp)
-                .totalCreditOnTheApp(totalCreditInTheApp)
+                .totalIncome(totalFundsOnTheApp)
+                .totalExpenses(totalExpensesOnTheApp)
                 .users(users)
                 .build();
     }

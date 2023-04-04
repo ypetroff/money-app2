@@ -2,8 +2,6 @@ package com.example.moneyapp2.web;
 
 import com.example.moneyapp2.model.dto.AccountDashboardDTO;
 import com.example.moneyapp2.service.AccountService;
-import com.example.moneyapp2.service.CreditService;
-import com.example.moneyapp2.service.DebitService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,11 +17,10 @@ public class AccountController {
 
     private final AccountService accountService;
 
-    @GetMapping("/info")
-    public ResponseEntity<?> account(Principal principal) {
+    @GetMapping("/overview")
+    public ResponseEntity<AccountDashboardDTO> account(Principal principal) {
 
-        AccountDashboardDTO accountInfo = this.accountService.getUserAccountInfo(principal.getName());
-
-        return ResponseEntity.ok(accountInfo);
+        return ResponseEntity.ok(this.accountService.getUserAccountInfo(principal.getName()));
     }
+
 }

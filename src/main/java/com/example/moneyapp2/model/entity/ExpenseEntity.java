@@ -1,13 +1,19 @@
 package com.example.moneyapp2.model.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import com.example.moneyapp2.model.entity.user.UserEntity;
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "expenses")
 public class ExpenseEntity extends BaseEntity{
@@ -31,5 +37,8 @@ public class ExpenseEntity extends BaseEntity{
 
     @ManyToOne
     private ExpenseCategoryEntity category;
+
+    @OneToOne
+    private UserEntity owner;
 }
 

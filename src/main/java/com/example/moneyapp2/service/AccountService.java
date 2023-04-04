@@ -1,31 +1,26 @@
 package com.example.moneyapp2.service;
 
 import com.example.moneyapp2.model.dto.AccountDashboardDTO;
-import com.example.moneyapp2.model.dto.CreditDataDTO;
-import com.example.moneyapp2.model.dto.DebitDataDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.math.BigDecimal;
 
 @Service
 @RequiredArgsConstructor
 public class AccountService {
 
-    private final DebitService debitService;
-    private final CreditService creditService;
-
-    private final UserService userService;
+    private final IncomeService incomeService;
+    private final ExpenseService expenseService;
 
     public AccountDashboardDTO getUserAccountInfo(String username) {
 
-        DebitDataDTO debit = this.debitService.getDebitOfUser(username);
-        CreditDataDTO credit = this.creditService.getCreditOfUser(username);
-
+        BigDecimal income = this.incomeService.getIncomeOfUser(username);
+        BigDecimal expenses = this.expenseService.getExpensesOfUser(username);
 
         return AccountDashboardDTO.builder()
-                .cash(debit.getCash())
-                .card(debit.getCard())
-                .credit(credit.getCredit())
+                .income(income)
+                .expenses(expenses)
                 .build();
     }
-
 }

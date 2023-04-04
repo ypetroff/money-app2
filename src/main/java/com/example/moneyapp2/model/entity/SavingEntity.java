@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -16,9 +17,9 @@ import java.util.List;
 @AllArgsConstructor
 @Entity
 @Table(name = "savings")
-public class SavingsEntity extends BaseEntity {
+public class SavingEntity extends BaseEntity {
 
-    public SavingsEntity() {
+    public SavingEntity() {
         this.owners = new ArrayList<>();
         this.contributors = new ArrayList<>();
     }
@@ -30,7 +31,7 @@ public class SavingsEntity extends BaseEntity {
     private LocalDateTime dateOfCreation;
 
     @Column(name = "end_date", nullable = false)
-    private LocalDateTime endDate;
+    private LocalDate endDate;
 
     @Column(name = "goal", columnDefinition = "VARCHAR(255) default 'not provided by user'")
     private String goal;
@@ -41,11 +42,11 @@ public class SavingsEntity extends BaseEntity {
     @ManyToMany
     private List<UserEntity> contributors;
 
-    private void addOwner(UserEntity owner) {
+    public void addOwner(UserEntity owner) {
         this.owners.add(owner);
     }
 
-    private void addContributor(UserEntity contributor) {
+    public void addContributor(UserEntity contributor) {
         this.contributors.add(contributor);
     }
 

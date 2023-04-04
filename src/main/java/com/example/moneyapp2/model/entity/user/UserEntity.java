@@ -2,7 +2,9 @@ package com.example.moneyapp2.model.entity.user;
 
 import com.example.moneyapp2.model.entity.*;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,8 +18,9 @@ public class UserEntity extends BaseEntity {
 
     public UserEntity() {
         this.userRoles = new ArrayList<>();
-        this.credits = new ArrayList<>();
+        this.income = new ArrayList<>();
         this.expenses = new ArrayList<>();
+        this.savings = new ArrayList<>();
     }
 
     @Column(name = "password", nullable = false)
@@ -38,26 +41,17 @@ public class UserEntity extends BaseEntity {
     @ManyToMany(fetch = FetchType.EAGER)
     private List<UserRoleEntity> userRoles;
 
-    @OneToOne
-    private DebitEntity debit;
-
-    @ManyToMany
-    private List<CreditEntity> credits;
+    @OneToMany
+    private List<IncomeEntity> income;
 
     @OneToMany
     private List<ExpenseEntity> expenses;
+
+    @ManyToMany
+    private List<SavingEntity> savings;
 
 
     public void addRole(UserRoleEntity role) {
         this.userRoles.add(role);
     }
-
-    public void addCredit(CreditEntity credit) {
-        this.credits.add(credit);
-    }
-
-    public void addExpense(ExpenseEntity expense) {
-        this.expenses.add(expense);
-    }
-
 }

@@ -1,6 +1,6 @@
 package com.example.moneyapp2.repository;
 
-import com.example.moneyapp2.model.entity.ExpenseEntity;
+import com.example.moneyapp2.model.entity.IncomeEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -10,13 +10,13 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface ExpenseRepository extends JpaRepository<ExpenseEntity, Long> {
+public interface IncomeRepository extends JpaRepository<IncomeEntity, Long> {
 
     @Query("""
-            SELECT SUM(e.totalPrice)
-            FROM ExpenseEntity e
+            SELECT SUM(d.amount)
+            FROM IncomeEntity d
             """)
-    Optional<BigDecimal> allUsersExpenseSum();
+    Optional<BigDecimal> allIncomeSum();
 
-    Optional<List<ExpenseEntity>> findByOwnerUsername(String username);
+    Optional<List<IncomeEntity>> findByOwnerUsername(String username);
 }

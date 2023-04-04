@@ -18,26 +18,26 @@ public interface UserRepository extends JpaRepository<UserEntity, Long> {
     Boolean existsByUsername(String username);
 
     @Query("""
-            SELECT SUM(d.cash) FROM UserEntity u
-            JOIN  u.debit d
+            SELECT i.amount
+            FROM UserEntity u
+            JOIN u.income i
             WHERE u.id = :id
             """)
-    Optional<BigDecimal> userCashSum(Long id);
-
+    Optional<BigDecimal> incomeSum(Long id);
 
     @Query("""
-            SELECT SUM(d.card)
+            SELECT e.totalPrice
             FROM UserEntity u
-            JOIN  u.debit d
+            JOIN u.expenses e
             WHERE u.id = :id
             """)
-    Optional<BigDecimal> userCardSum(Long id);
+    Optional<BigDecimal> expensesSum(Long id);
 
     @Query("""
-            SELECT SUM(c.amount)
-            FROM UserEntity u
-            JOIN u.credits c
-            WHERE u.id = :id
-                        """)
-    Optional<BigDecimal> findCreditsAmountById(Long id);
+SELECT s.amount
+FROM UserEntity u
+JOIN u.savings s
+WHERE u.id = :id
+""")
+    Optional<BigDecimal> savingsSum(Long id);
 }
