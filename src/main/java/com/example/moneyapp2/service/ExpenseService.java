@@ -17,6 +17,8 @@ import java.math.BigDecimal;
 public class ExpenseService {
 
     private final ExpenseRepository expenseRepository;
+
+    private final ExpenseCategoryService expenseCategoryService;
     private final UserService userService;
     private final ModelMapper modelMapper;
 
@@ -37,17 +39,28 @@ public class ExpenseService {
     }
 
     public void createEntityAndSaveIt(CreateExpenseDTO addExpenseDTO, String username) {
+
         ExpenseEntity entity = this.modelMapper.map(addExpenseDTO, ExpenseEntity.class);
-        entity.setOwner(this.modelMapper.map(this.userService.findUser(username), UserEntity.class));
+
+        setOwnerAndCategory(entity, username, addExpenseDTO.getCategory());
 
         this.expenseRepository.saveAndFlush(entity);
     }
 
     public void createEntityAndSaveIt(CreateExpenseMandatoryFieldsDTO addExpenseDTO, String username) {
+
         ExpenseEntity entity = this.modelMapper.map(addExpenseDTO, ExpenseEntity.class);
-        entity.setOwner(this.modelMapper.map(this.userService.findUser(username), UserEntity.class));
+
+        setOwnerAndCategory(entity, username, addExpenseDTO.getCategory());
 
         this.expenseRepository.saveAndFlush(entity);
+    }
+
+    private void setOwnerAndCategory(ExpenseEntity entity, String username, String addExpenseDTO) {
+
+        entity.setOwner(this.modelMapper.map(this.userService.findUser(username), UserEntity.class));
+
+        entity.setCategory(this.expenseCategoryService.addCategory(addExpenseDTO));
     }
 
 

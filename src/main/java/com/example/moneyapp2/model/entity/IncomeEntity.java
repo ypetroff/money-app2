@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(name = "income")
+@Table(name = "incomes")
 public class IncomeEntity extends BaseEntity{
 
     @Column(name = "amount", columnDefinition = "DECIMAL(10 , 2) default 0", nullable = false)
@@ -25,7 +25,7 @@ public class IncomeEntity extends BaseEntity{
     @Column(name = "created_on", nullable = false)
     private LocalDateTime createdOn;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     private IncomeCategoryEntity incomeCategory;
 
     @OneToOne

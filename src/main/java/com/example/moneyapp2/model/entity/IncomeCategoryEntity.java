@@ -10,7 +10,7 @@ import lombok.*;
 @NoArgsConstructor
 @Builder
 @Entity
-@Table(name = "income_category")
+@Table(name = "income_categories")
 public class IncomeCategoryEntity extends BaseEntity {
     @Enumerated(EnumType.STRING)
     @Column(name = "category", nullable = false)

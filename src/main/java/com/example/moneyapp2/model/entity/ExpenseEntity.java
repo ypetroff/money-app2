@@ -21,7 +21,6 @@ public class ExpenseEntity extends BaseEntity{
     @Column(name = "name", nullable = false)
     private String name;
 
-    //TODO: When the user inputs totalPrice, pricePerUnit and numberOfUnits could be null
     @Column(name = "price_per_unit")
     private BigDecimal pricePerUnit;
 
@@ -32,7 +31,7 @@ public class ExpenseEntity extends BaseEntity{
     private BigDecimal totalPrice;
 
     //NOTE: another option - set a default param for expenseDTO OR set default in the controller
-    @Column(name = "date_of_purchase", columnDefinition = "TIMESTAMP default NOW()")
+    @Column(name = "date_of_purchase", columnDefinition = "TIMESTAMP default NOW() ")
     private LocalDateTime timeOfPurchase;
 
     @ManyToOne

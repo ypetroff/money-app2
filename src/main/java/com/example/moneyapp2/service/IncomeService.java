@@ -4,8 +4,10 @@ import com.example.moneyapp2.exception.NoAvailableDataException;
 import com.example.moneyapp2.model.dto.income.CreateIncomeDTO;
 import com.example.moneyapp2.model.dto.income.IncomeDetailsDTO;
 import com.example.moneyapp2.model.dto.income.IncomeInfoDTO;
+import com.example.moneyapp2.model.entity.IncomeCategoryEntity;
 import com.example.moneyapp2.model.entity.IncomeEntity;
 import com.example.moneyapp2.model.entity.user.UserEntity;
+import com.example.moneyapp2.model.enums.IncomeCategory;
 import com.example.moneyapp2.repository.IncomeRepository;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -20,6 +22,8 @@ import java.util.Optional;
 public class IncomeService {
     
     private final IncomeRepository incomeRepository;
+
+    private final IncomeCategoryService incomeCategoryService;
     private final UserService userService;
     private final ModelMapper modelMapper;
 
@@ -57,6 +61,7 @@ public class IncomeService {
     public void createEntityAndSaveIt(CreateIncomeDTO addIncomeDTO, String username) {
         IncomeEntity entity = this.modelMapper.map(addIncomeDTO, IncomeEntity.class);
         entity.setOwner(this.modelMapper.map(this.userService.findUser(username), UserEntity.class));
+        entity.setIncomeCategory(this.incomeCategoryService.addCategory(addIncomeDTO.getIncomeCategory()));
 
         this.incomeRepository.saveAndFlush(entity);
     }

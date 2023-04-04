@@ -20,7 +20,6 @@ public class CreateExpenseDTO {
     private String name;
 
     @Digits(integer = 10, fraction = 2)
-    @NotEmpty
     private BigDecimal pricePerUnit;
 
     @NotNull
@@ -28,11 +27,9 @@ public class CreateExpenseDTO {
     private Integer numberOfUnits;
 
     @Digits(integer = 10, fraction = 2)
-    @NotEmpty
     private BigDecimal totalPrice;
 
     @PastOrPresent
-    @NotEmpty
     private LocalDateTime timeOfPurchase;
 
     @NotEmpty
