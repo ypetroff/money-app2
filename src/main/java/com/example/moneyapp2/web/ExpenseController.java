@@ -1,8 +1,6 @@
 package com.example.moneyapp2.web;
 
-import com.example.moneyapp2.model.dto.expense.CreateExpenseDTO;
-import com.example.moneyapp2.model.dto.expense.ExpenseDetailsDTO;
-import com.example.moneyapp2.model.dto.expense.ExpenseInfoDTO;
+import com.example.moneyapp2.model.dto.expense.*;
 import com.example.moneyapp2.service.ExpenseService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -33,14 +31,28 @@ public class ExpenseController {
                                                                                            principal.getName()));
     }
 
+    @PostMapping("/add")
+    public ResponseEntity<List<ExpenseInfoDTO>> addNewExpense(@Valid @RequestBody CreateExpenseMandatoryFieldsDTO expenseDTO,
+                                                              Principal principal) {
+
+        return ResponseEntity.ok(this.expenseService.addNewExpenseAndReturnAllIncomeOfUser(expenseDTO,
+                principal.getName()));
+    }
+
     @GetMapping("/details/{id}")
-    public ResponseEntity<ExpenseDetailsDTO> detailedExpenseInfo(@PathVariable Long id) {
+    public ResponseEntity<?> detailedExpenseInfo(@PathVariable Long id) {
 
         if(this.expenseService.ExpenseNotPresent(id)) {
             return ResponseEntity.notFound().build();
         }
 
-        return ResponseEntity.ok(this.expenseService.getDetailsOfExpense(id));
+        Object detailsOfExpense = this.expenseService.getDetailsOfExpense(id);
+
+        if(detailsOfExpense instanceof ExpenseMandatoryFieldsDetailsDTO) {
+            return ResponseEntity.ok((ExpenseMandatoryFieldsDetailsDTO) detailsOfExpense);
+        }
+
+        return ResponseEntity.ok((ExpenseDetailsDTO) detailsOfExpense);
     }
 
     @PatchMapping("/edit/{id}")

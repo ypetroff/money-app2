@@ -1,6 +1,9 @@
 package com.example.moneyapp2.service;
 
+import com.example.moneyapp2.model.dto.expense.CreateExpenseDTO;
+import com.example.moneyapp2.model.dto.expense.ExpenseInfoDTO;
 import com.example.moneyapp2.model.dto.saving.CreateSavingDTO;
+import com.example.moneyapp2.model.dto.saving.SavingInfoDTO;
 import com.example.moneyapp2.model.dto.user.UserForServicesDTO;
 import com.example.moneyapp2.model.entity.ExpenseEntity;
 import com.example.moneyapp2.model.entity.SavingEntity;
@@ -11,6 +14,8 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -63,4 +68,40 @@ public class SavingService {
     private UserForServicesDTO getUser(String o) {
         return this.userService.findUser(o);
     }
+
+    public List<SavingInfoDTO> getAllSavingOfUser(String username) {
+
+        return listOfSavingInfoDTO(username);
+    }
+
+    private List<SavingInfoDTO> listOfSavingInfoDTO(String username) {
+
+        return getByOwnerUsername(username).stream()
+                .map(i -> this.modelMapper.map(i, SavingInfoDTO.class))
+                .toList();
+    }
+
+    private Optional<List<SavingInfoDTO>> getByOwnerUsername(String username) {
+
+        //todo: implement logic
+        return null;
+    }
+
+    public List<SavingInfoDTO> addNewSavingAndReturnAllSavingsOfUser(CreateSavingDTO savingDTO, String username) {
+
+        createEntityAndSaveIt(savingDTO, username);
+
+        return listOfSavingInfoDTO(username);
+    }
+
+    public void createEntityAndSaveIt(CreateSavingDTO addSavingDTO, String username) {
+
+        SavingEntity entity = this.modelMapper.map(addSavingDTO, SavingEntity.class);
+
+//        setOwnerAndCategory(entity, username); //todo: optimise
+
+        this.savingsRepository.saveAndFlush(entity);
+    }
+
+
 }

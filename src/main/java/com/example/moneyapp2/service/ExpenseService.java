@@ -1,10 +1,7 @@
 package com.example.moneyapp2.service;
 
 import com.example.moneyapp2.exception.NoAvailableDataException;
-import com.example.moneyapp2.model.dto.expense.CreateExpenseDTO;
-import com.example.moneyapp2.model.dto.expense.CreateExpenseMandatoryFieldsDTO;
-import com.example.moneyapp2.model.dto.expense.ExpenseDetailsDTO;
-import com.example.moneyapp2.model.dto.expense.ExpenseInfoDTO;
+import com.example.moneyapp2.model.dto.expense.*;
 import com.example.moneyapp2.model.dto.income.IncomeDetailsDTO;
 import com.example.moneyapp2.model.dto.income.IncomeInfoDTO;
 import com.example.moneyapp2.model.entity.ExpenseEntity;
@@ -77,16 +74,29 @@ public class ExpenseService {
     }
 
 
-    public ExpenseDetailsDTO getDetailsOfExpense(Long id) {
+    public Object getDetailsOfExpense(Long id) {
 
-       return this.modelMapper.map(this.expenseRepository.findById(id)
-                        .orElseThrow(() -> new NoAvailableDataException(
-                                String.format("Expense with id: %d not found", id))),
+       ExpenseEntity entity = this.expenseRepository.findById(id)
+                .orElseThrow(() -> new NoAvailableDataException(
+                String.format("Expense with id: %d not found", id)));
+
+       if(entity.getPricePerUnit() == null || entity.getNumberOfUnits() == null) {
+           return this.modelMapper.map(entity, ExpenseMandatoryFieldsDetailsDTO.class);
+       }
+
+        return this.modelMapper.map(entity,
                ExpenseDetailsDTO.class);
     }
 
     public List<ExpenseInfoDTO> addNewExpenseAndReturnAllIncomeOfUser(CreateExpenseDTO expenseDTO,
                                                                                       String username) {
+        createEntityAndSaveIt(expenseDTO, username);
+
+        return listOfExpenseInfoDTO(username);
+    }
+
+    public List<ExpenseInfoDTO> addNewExpenseAndReturnAllIncomeOfUser(CreateExpenseMandatoryFieldsDTO expenseDTO,
+                                                                      String username) {
         createEntityAndSaveIt(expenseDTO, username);
 
         return listOfExpenseInfoDTO(username);
