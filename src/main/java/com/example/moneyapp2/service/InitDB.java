@@ -233,3 +233,4 @@ public class InitDB {
         this.savingService.createEntityAndSaveIt(rentForTheMonth);
     }
 }
+
