@@ -96,5 +96,14 @@ public class IncomeService {
 
         return this.modelMapper.map(entity, IncomeDetailsDTO.class);
     }
+
+    public boolean IncomeNotPresent(Long id) {
+
+        return !this.incomeRepository.existsById(id);
+    }
+
+    public void deleteIncome(Long id) {
+        this.incomeRepository.deleteById(id);
+    }
 }
 

@@ -25,19 +25,41 @@ public class IncomeController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<  List<IncomeInfoDTO>> addNewIncome(@Valid @RequestBody CreateIncomeDTO addIncomeDTO, Principal principal) {
+    public ResponseEntity<List<IncomeInfoDTO>> addNewIncome(@Valid @RequestBody CreateIncomeDTO incomeDTO, Principal principal) {
 
-        return ResponseEntity.ok(this.incomeService.addNewIncomeAndReturnAllIncomeOfUser(addIncomeDTO, principal.getName()));
+        return ResponseEntity.ok(this.incomeService.addNewIncomeAndReturnAllIncomeOfUser(incomeDTO, principal.getName()));
     }
 
     @GetMapping("/details/{id}")
     public ResponseEntity<IncomeDetailsDTO> detailedIncomeInfo(@PathVariable Long id) {
+
+        if(this.incomeService.IncomeNotPresent(id)) {
+            return ResponseEntity.notFound().build();
+        }
+
         return ResponseEntity.ok(this.incomeService.getDetailsOfIncome(id));
     }
 
     @PatchMapping("/edit/{id}")
     public ResponseEntity<IncomeDetailsDTO> editIncomeInfo(@PathVariable Long id,
-                                                          @RequestBody CreateIncomeDTO changedIncomeInfo) {
+                                                          @Valid @RequestBody CreateIncomeDTO changedIncomeInfo) {
+
+        if(this.incomeService.IncomeNotPresent(id)) {
+            return ResponseEntity.notFound().build();
+        }
+
         return ResponseEntity.ok(this.incomeService.editIncome(id, changedIncomeInfo));
+    }
+
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<Void> deleteIncome(@PathVariable Long id) {
+
+        if(this.incomeService.IncomeNotPresent(id)) {
+            return ResponseEntity.notFound().build();
+        }
+
+        this.incomeService.deleteIncome(id);
+
+        return ResponseEntity.noContent().build();
     }
 }
