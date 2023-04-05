@@ -8,6 +8,8 @@ import com.example.moneyapp2.repository.ExpenseCategoryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class ExpenseCategoryService {
@@ -18,5 +20,13 @@ public class ExpenseCategoryService {
 
       return this.expenseCategoryRepository.findByCategory(ExpenseCategory.valueOf(category))
               .orElseThrow(() -> new NoAvailableDataException("There's no such role"));
+    }
+
+    public List<String> categoriesToString() {
+
+        return this.expenseCategoryRepository.findAll().stream()
+                .map(ExpenseCategoryEntity::getCategory)
+                .map(ExpenseCategory::name)
+                .toList();
     }
 }

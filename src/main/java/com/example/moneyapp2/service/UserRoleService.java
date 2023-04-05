@@ -6,6 +6,7 @@ import com.example.moneyapp2.repository.UserRoleRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @RequiredArgsConstructor
@@ -30,5 +31,13 @@ public class UserRoleService {
         Optional<UserRoleEntity> userRole = this.userRoleRepository.findByUserRole(role);
 
         return userRole.orElseGet(UserRoleEntity::new); //todo: custom exception
+    }
+
+    public List<String> categoriesToString() {
+
+        return this.userRoleRepository.findAll().stream()
+                .map(UserRoleEntity::getUserRole)
+                .map(UserRole::name)
+                .toList();
     }
 }
