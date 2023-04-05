@@ -54,4 +54,8 @@ public class UserEntity extends BaseEntity {
     public void addRole(UserRoleEntity role) {
         this.userRoles.add(role);
     }
+
+    public void addIncome(IncomeEntity income) {
+        this.income.add(income);
+    }
 }
