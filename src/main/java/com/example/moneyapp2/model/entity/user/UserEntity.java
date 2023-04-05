@@ -17,10 +17,8 @@ import java.util.List;
 public class UserEntity extends BaseEntity {
 
     public UserEntity() {
+
         this.userRoles = new ArrayList<>();
-        this.income = new ArrayList<>();
-        this.expenses = new ArrayList<>();
-        this.savings = new ArrayList<>();
     }
 
     @Column(name = "password", nullable = false)
@@ -41,21 +39,16 @@ public class UserEntity extends BaseEntity {
     @ManyToMany(fetch = FetchType.EAGER)
     private List<UserRoleEntity> userRoles;
 
-    @OneToMany
-    private List<IncomeEntity> income;
-
-    @OneToMany
-    private List<ExpenseEntity> expenses;
-
-    @ManyToMany
-    private List<SavingEntity> savings;
-
-
     public void addRole(UserRoleEntity role) {
         this.userRoles.add(role);
     }
 
-    public void addIncome(IncomeEntity income) {
-        this.income.add(income);
+    public void removeRole(UserRoleEntity role) {
+        this.userRoles.remove(role);
+    }
+
+    @Override
+    public String toString() {
+        return username;
     }
 }

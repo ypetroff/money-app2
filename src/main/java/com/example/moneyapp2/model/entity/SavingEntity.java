@@ -2,9 +2,7 @@ package com.example.moneyapp2.model.entity;
 
 import com.example.moneyapp2.model.entity.user.UserEntity;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -12,9 +10,10 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-@Data
-@EqualsAndHashCode(callSuper = true)
+@Getter
+@Setter
 @AllArgsConstructor
+@Builder
 @Entity
 @Table(name = "savings")
 public class SavingEntity extends BaseEntity {

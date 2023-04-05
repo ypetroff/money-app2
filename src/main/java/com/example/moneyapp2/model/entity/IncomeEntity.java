@@ -28,6 +28,6 @@ public class IncomeEntity extends BaseEntity{
     @ManyToOne(fetch = FetchType.EAGER)
     private IncomeCategoryEntity incomeCategory;
 
-    @OneToOne
+    @ManyToOne
     private UserEntity owner;
 }

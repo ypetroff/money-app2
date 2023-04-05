@@ -1,7 +1,9 @@
 package com.example.moneyapp2.service;
 
 import com.example.moneyapp2.exception.NoAvailableDataException;
+import com.example.moneyapp2.model.dto.expense.EditExpenseDTO;
 import com.example.moneyapp2.model.dto.income.CreateIncomeDTO;
+import com.example.moneyapp2.model.dto.income.EditIncomeDTO;
 import com.example.moneyapp2.model.dto.income.IncomeDetailsDTO;
 import com.example.moneyapp2.model.dto.income.IncomeInfoDTO;
 import com.example.moneyapp2.model.entity.IncomeCategoryEntity;
@@ -68,7 +70,9 @@ public class IncomeService {
 
     private List<IncomeInfoDTO> listOfIncomeInfoDTO(String username) {
 
-        return getByOwnerUsername(username).stream()
+        return getByOwnerUsername(username)
+                .orElseThrow(() -> new NoAvailableDataException("No income"))
+                .stream()
                 .map(i -> this.modelMapper.map(i, IncomeInfoDTO.class))
                 .toList();
     }
@@ -104,6 +108,25 @@ public class IncomeService {
 
     public void deleteIncome(Long id) {
         this.incomeRepository.deleteById(id);
+    }
+
+    public Optional<BigDecimal> incomeSum(Long id) {
+        return incomeRepository.userIncomeSum(id);
+    }
+
+    public boolean unauthorizedUser(Long id, String username) {
+
+        IncomeEntity entity = this.incomeRepository.findById(id)
+                .orElseThrow(() -> new NoAvailableDataException("Income not found"));
+
+        return !entity.getOwner().getUsername().equals(username);
+    }
+
+    public EditIncomeDTO getSingleIncome(Long id) {
+
+        return this.modelMapper.map(this.incomeRepository.findById(id)
+                        .orElseThrow(() -> new NoAvailableDataException("Non existent income")),
+                EditIncomeDTO.class);
     }
 }
 

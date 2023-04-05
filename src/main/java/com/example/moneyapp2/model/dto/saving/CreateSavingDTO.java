@@ -1,9 +1,6 @@
 package com.example.moneyapp2.model.dto.saving;
 
-import jakarta.validation.constraints.Digits;
-import jakarta.validation.constraints.Future;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.PastOrPresent;
+import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -20,22 +17,20 @@ import java.util.List;
 @Builder
 public class CreateSavingDTO {
 
-    @Digits(integer = 10, fraction = 2)
-    @NotEmpty
+    @Digits(integer = 10, fraction = 2, message = "Incorrect amount. Check if all symbols are valid numbers and you are using a decimal point")
     private BigDecimal amount;
 
-    @PastOrPresent
-    @NotEmpty
+    @PastOrPresent(message = "The date should be past or present")
     private LocalDateTime dateOfCreation;
 
-    @Future
+    @Future(message = "This date should be in the future")
     private LocalDate endDate;
 
     private String goal;
 
-    @NotEmpty
+    @NotNull(message = "At least one user should be an owner")
     private List<String> owners;
 
-    @NotEmpty
+    @NotNull(message = "At least one user should be a contributor")
     private List<String> contributors;
 }

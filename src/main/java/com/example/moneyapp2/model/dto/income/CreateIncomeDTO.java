@@ -20,12 +20,10 @@ public class CreateIncomeDTO {
 
     @Digits(integer = 10, fraction = 2)
     @Positive
-    @NotEmpty
     private BigDecimal amount;
 
     private String description;
 
-    @NotEmpty
     @PastOrPresent
     private LocalDateTime createdOn;
 

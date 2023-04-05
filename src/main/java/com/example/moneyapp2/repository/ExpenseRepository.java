@@ -18,5 +18,13 @@ public interface ExpenseRepository extends JpaRepository<ExpenseEntity, Long> {
             """)
     Optional<BigDecimal> allUsersExpenseSum();
 
+    @Query("""
+            SELECT SUM(e.totalPrice)
+            FROM ExpenseEntity e
+            JOIN  e.owner o
+            WHERE o.id = :id
+            """)
+    Optional<BigDecimal> userExpenseSum(Long id);
+
     Optional<List<ExpenseEntity>> findByOwnerUsername(String username);
 }

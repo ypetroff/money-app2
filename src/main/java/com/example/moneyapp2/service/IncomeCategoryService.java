@@ -13,11 +13,6 @@ public class IncomeCategoryService {
 
     private final IncomeCategoryRepository incomeCategoryRepository;
 
-    public boolean isUserIncomeCategoryRepositoryEmpty() {
-
-        return this.incomeCategoryRepository.count() == 0;
-    }
-
     public void saveCategoryToDB(IncomeCategory incomeCategory) {
 
         IncomeCategoryEntity entity = new IncomeCategoryEntity();

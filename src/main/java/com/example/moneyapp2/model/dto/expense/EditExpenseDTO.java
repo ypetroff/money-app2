@@ -26,7 +26,6 @@ public class EditExpenseDTO {
     private Integer numberOfUnits;
 
     @Digits(integer = 10, fraction = 2)
-    @NotEmpty
     private BigDecimal totalPrice;
 
     @NotEmpty

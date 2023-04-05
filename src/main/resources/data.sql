@@ -20,9 +20,9 @@ INSERT INTO incomes(id, amount, description, created_on, income_category_id, own
 VALUES (1, 10000.56, 'Salary', '2023-04-04 16:51:27.144758', 2, 1),
        (2, 900.56, 'Gift', '2023-04-04 16:51:27.144758', 1, 2);
 
-INSERT INTO users_income (user_entity_id, income_id)
-VALUES (1, 1),
-       (2, 2);
+-- INSERT INTO users_income (user_entity_id, income_id)
+-- VALUES (1, 1),
+--        (2, 2);
 
 INSERT INTO expense_categories (id, category)
 VALUES (1, 'FOOD_AND_DRINKS'),
@@ -45,12 +45,12 @@ VALUES (1, 'Movie tickets', 2, 25, '2023-01-23 22:22:27', 50, 6, 1),
        (4, 'rent', null, null, '2021-01-23 09:22:27', 800, 12, 2),
        (5, 'holiday', null, null, '2007-06-13 09:00:00', 2800, 7, 1);
 
-INSERT INTO users_expenses (user_entity_id, expenses_id)
-VALUES (1, 1),
-       (2, 2),
-       (2, 3),
-       (2, 4),
-       (1, 5);
+-- INSERT INTO users_expenses (user_entity_id, expenses_id)
+-- VALUES (1, 1),
+--        (2, 2),
+--        (2, 3),
+--        (2, 4),
+--        (1, 5);
 
 INSERT INTO savings (id, amount, date_of_creation, end_date, goal)
 VALUES (1, 10000, '2022-12-24 21:26', '2023-04-09', 'Summer holiday in Greece'),
@@ -67,6 +67,6 @@ VALUES (1, 1),
        (3, 1),
        (3, 2);
 
-INSERT INTO users_savings (user_entity_id, savings_id)
-VALUES (1, 1), (2, 2), (1, 3);
+-- INSERT INTO users_savings (user_entity_id, savings_id)
+-- VALUES (1, 1), (2, 2), (1, 3);
 

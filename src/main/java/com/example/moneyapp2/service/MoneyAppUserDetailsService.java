@@ -35,6 +35,7 @@ public class MoneyAppUserDetailsService implements UserDetailsService {
         return MoneyAppUserDetails.builder()
                 .username(userEntity.getUsername())
                 .password(userEntity.getPassword())
+                .firstName(userEntity.getFirstName())
                 .authorities(extractAuthorities(userEntity))
                 .build();
 

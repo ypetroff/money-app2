@@ -20,10 +20,8 @@ public class CreateExpenseMandatoryFieldsDTO {
     private String name;
 
     @Digits(integer = 10, fraction = 2)
-    @NotEmpty
     private BigDecimal totalPrice;
 
-    @NotEmpty
     @PastOrPresent
     private LocalDateTime timeOfPurchase;
 

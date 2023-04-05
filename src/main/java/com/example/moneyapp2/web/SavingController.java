@@ -1,15 +1,13 @@
 package com.example.moneyapp2.web;
 
-import com.example.moneyapp2.model.dto.expense.CreateExpenseDTO;
-import com.example.moneyapp2.model.dto.income.CreateIncomeDTO;
-import com.example.moneyapp2.model.dto.income.IncomeDetailsDTO;
-import com.example.moneyapp2.model.dto.income.IncomeInfoDTO;
 import com.example.moneyapp2.model.dto.saving.CreateSavingDTO;
+import com.example.moneyapp2.model.dto.saving.EditSavingDTO;
 import com.example.moneyapp2.model.dto.saving.SavingDetailsDTO;
 import com.example.moneyapp2.model.dto.saving.SavingInfoDTO;
 import com.example.moneyapp2.service.SavingService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -35,31 +33,59 @@ public class SavingController {
     }
 
     @GetMapping("/details/{id}")
-    public ResponseEntity<SavingDetailsDTO> detailedSavingInfo(@PathVariable Long id) {
+    public ResponseEntity<SavingDetailsDTO> detailedSavingInfo(@PathVariable Long id, Principal principal) {
 
         if(this.savingService.SavingNotPresent(id)) {
             return ResponseEntity.notFound().build();
         }
 
+        if(this.savingService.unauthorizedView(id, principal.getName())) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
         return ResponseEntity.ok(this.savingService.getDetailsOfSaving(id));
+    }
+
+    @GetMapping("/edit/{id}")
+    public ResponseEntity<EditSavingDTO> editSavingInfo(@PathVariable Long id,
+                                                        Principal principal) {
+
+        if(this.savingService.SavingNotPresent(id)) {
+            return ResponseEntity.notFound().build();
+        }
+
+        if(this.savingService.unauthorizedToModify(id, principal.getName())) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        return ResponseEntity.ok(this.savingService.getSingleSaving(id));
     }
 
     @PatchMapping("/edit/{id}")
     public ResponseEntity<SavingDetailsDTO> editSavingInfo(@PathVariable Long id,
-                                                           @Valid @RequestBody CreateSavingDTO changedSavingInfo) {
+                                                           @Valid @RequestBody CreateSavingDTO changedSavingInfo,
+                                                           Principal principal) {
 
         if(this.savingService.SavingNotPresent(id)) {
             return ResponseEntity.notFound().build();
+        }
+
+        if(this.savingService.unauthorizedToModify(id, principal.getName())) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
         return ResponseEntity.ok(this.savingService.editSaving(id, changedSavingInfo));
     }
 
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<Void> deleteIncome(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteIncome(@PathVariable Long id, Principal principal) {
 
         if(this.savingService.SavingNotPresent(id)) {
             return ResponseEntity.notFound().build();
+        }
+
+        if(this.savingService.unauthorizedToModify(id, principal.getName())) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
         this.savingService.deleteSaving(id);

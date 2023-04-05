@@ -5,6 +5,7 @@ import com.example.moneyapp2.model.dto.user.UserForAdminPanelDTO;
 import com.example.moneyapp2.model.dto.user.UserForServicesDTO;
 import com.example.moneyapp2.model.dto.user.UserInfoDTO;
 import com.example.moneyapp2.model.dto.user.UserRegisterDTO;
+import com.example.moneyapp2.model.entity.UserRoleEntity;
 import com.example.moneyapp2.model.entity.user.UserEntity;
 import com.example.moneyapp2.model.enums.UserRole;
 import com.example.moneyapp2.repository.UserRepository;
@@ -22,13 +23,14 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final UserRoleService userRoleService;
+
+//    private final IncomeService incomeService;
+//
+//    private final ExpenseService expenseService;
+//
+//    private final SavingService savingService;
     private final ModelMapper modelMapper;
     private final PasswordEncoder passwordEncoder;
-
-    public boolean isUserRepositoryEmpty() {
-        return this.userRepository.count() == 0;
-    }
-
 
     public boolean isEmailFreeToUse(String email) {
         return !this.userRepository.existsByEmail(email);
@@ -60,6 +62,12 @@ public class UserService {
         this.userRepository.saveAndFlush(user);
     }
 
+    public UserEntity findUserEntity (String username) {
+
+        return this.userRepository.findByUsername(username)
+                .orElseThrow(() -> new NoAvailableDataException("User not found, based on principal username"));
+    }
+
     public UserForServicesDTO findUser(String username) {
         UserEntity entity = this.userRepository.findByUsername(username)
                 .orElseThrow(() -> new NoAvailableDataException("User not found, based on principal username"));
@@ -71,31 +79,31 @@ public class UserService {
         return this.userRepository.count();
     }
 
-    public UserInfoDTO provideUserDashboardData(String username) {
+//    public UserInfoDTO provideUserDashboardData(String username) {
+//
+//        UserEntity user = this.userRepository.findByUsername(username)
+//                .orElseThrow(() -> new NoAvailableDataException("User not found, based on principal username for user dashboard"));
+//
+//        return mapUserEntityToUserInfoDTO(user);
+//    }
 
-        UserEntity user = this.userRepository.findByUsername(username)
-                .orElseThrow(() -> new NoAvailableDataException("User not found, based on principal username for user dashboard"));
-
-        return mapUserEntityToUserInfoDTO(user);
-    }
-
-    private UserInfoDTO mapUserEntityToUserInfoDTO(UserEntity user) {
-
-        BigDecimal userTotalIncome = this.userRepository.incomeSum(user.getId())
-                .orElse(BigDecimal.ZERO);
-        BigDecimal userTotalExpenses = this.userRepository.expensesSum(user.getId())
-                .orElse(BigDecimal.ZERO);
-        BigDecimal userTotalSavings = this.userRepository.savingsSum(user.getId())
-                .orElse(BigDecimal.ZERO);
-
-        return UserInfoDTO.builder()
-                .id(user.getId())
-                .username(user.getUsername())
-                .income(userTotalIncome)
-                .expenses(userTotalExpenses)
-                .savings(userTotalSavings)
-                .build();
-    }
+//    private UserInfoDTO mapUserEntityToUserInfoDTO(UserEntity user) {
+//
+//        BigDecimal userTotalIncome = this.incomeService.incomeSum(user.getId())
+//                .orElse(BigDecimal.ZERO);
+//        BigDecimal userTotalExpenses = this.expenseService.expensesSum(user.getId())
+//                .orElse(BigDecimal.ZERO);
+//        BigDecimal userTotalSavings = this.savingService.savingsSum(user.getId())
+//                .orElse(BigDecimal.ZERO);
+//
+//        return UserInfoDTO.builder()
+//                .id(user.getId())
+//                .username(user.getUsername())
+//                .income(userTotalIncome)
+//                .expenses(userTotalExpenses)
+//                .savings(userTotalSavings)
+//                .build();
+//    }
 
 
     public List<UserForAdminPanelDTO> getAllUsersForAdminPanel() {
@@ -105,4 +113,33 @@ public class UserService {
     }
 
 
+    public boolean isNotPresent(Long id) {
+
+        return !this.userRepository.existsById(id);
+    }
+
+    public void deleteUser(Long id) {
+
+        this.userRepository.deleteById(id);
+    }
+
+    public void makeAdmin(Long id) {
+
+        UserEntity entity = this.userRepository.findById(id)
+                .orElseThrow(() -> new NoAvailableDataException("User not found"));
+
+        entity.addRole(this.userRoleService.getRole(UserRole.ADMIN));
+
+        this.userRepository.saveAndFlush(entity);
+    }
+
+    public void removeAdminRights(Long id) {
+
+        UserEntity entity = this.userRepository.findById(id)
+                .orElseThrow(() -> new NoAvailableDataException("User not found"));
+
+        entity.removeRole(this.userRoleService.getRole(UserRole.ADMIN));
+
+        this.userRepository.saveAndFlush(entity);
+    }
 }

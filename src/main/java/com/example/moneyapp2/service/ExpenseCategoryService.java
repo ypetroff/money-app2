@@ -14,18 +14,6 @@ public class ExpenseCategoryService {
 
     private final ExpenseCategoryRepository expenseCategoryRepository;
 
-    public boolean isExpenseCategoryRepositoryEmpty() {
-        return this.expenseCategoryRepository.count() == 0;
-    }
-
-    public void saveCategoryToDB(ExpenseCategory category) {
-
-        ExpenseCategoryEntity entity = new ExpenseCategoryEntity();
-        entity.setCategory(category);
-
-        this.expenseCategoryRepository.saveAndFlush(entity);
-    }
-
     public ExpenseCategoryEntity addCategory(String category) {
 
       return this.expenseCategoryRepository.findByCategory(ExpenseCategory.valueOf(category))

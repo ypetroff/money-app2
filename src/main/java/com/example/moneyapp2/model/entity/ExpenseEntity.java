@@ -30,14 +30,13 @@ public class ExpenseEntity extends BaseEntity{
     @Column(name = "total_price", nullable = false)
     private BigDecimal totalPrice;
 
-    //NOTE: another option - set a default param for expenseDTO OR set default in the controller
     @Column(name = "date_of_purchase", columnDefinition = "TIMESTAMP default NOW() ")
     private LocalDateTime timeOfPurchase;
 
     @ManyToOne
     private ExpenseCategoryEntity category;
 
-    @OneToOne
+    @ManyToOne
     private UserEntity owner;
 }
 

@@ -1,15 +1,13 @@
 package com.example.moneyapp2.service;
 
 import com.example.moneyapp2.exception.NoAvailableDataException;
-import com.example.moneyapp2.model.dto.expense.ExpenseDetailsDTO;
-import com.example.moneyapp2.model.dto.expense.ExpenseMandatoryFieldsDetailsDTO;
+import com.example.moneyapp2.model.dto.expense.EditExpenseDTO;
 import com.example.moneyapp2.model.dto.income.CreateIncomeDTO;
+import com.example.moneyapp2.model.dto.income.EditIncomeDTO;
 import com.example.moneyapp2.model.dto.saving.CreateSavingDTO;
+import com.example.moneyapp2.model.dto.saving.EditSavingDTO;
 import com.example.moneyapp2.model.dto.saving.SavingDetailsDTO;
 import com.example.moneyapp2.model.dto.saving.SavingInfoDTO;
-import com.example.moneyapp2.model.dto.user.UserForServicesDTO;
-import com.example.moneyapp2.model.entity.ExpenseEntity;
-import com.example.moneyapp2.model.entity.IncomeEntity;
 import com.example.moneyapp2.model.entity.SavingEntity;
 import com.example.moneyapp2.model.entity.user.UserEntity;
 import com.example.moneyapp2.model.enums.IncomeCategory;
@@ -21,6 +19,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -29,15 +28,12 @@ import java.util.Optional;
 public class SavingService {
 
     private final SavingsRepository savingsRepository;
+
     private final UserService userService;
 
     private final IncomeService incomeService;
+
     private final ModelMapper modelMapper;
-
-
-    private UserForServicesDTO getUser(String o) {
-        return this.userService.findUser(o);
-    }
 
     public List<SavingInfoDTO> getAllSavingOfUser(String username) {
 
@@ -46,7 +42,14 @@ public class SavingService {
 
     private List<SavingInfoDTO> listOfSavingInfoDTO(String username) {
 
-        return getByOwnerUsername(username);
+        UserEntity userEntity = this.modelMapper.map(this.userService.findUser(username), UserEntity.class);
+
+        return this.savingsRepository.findAllByOwnersContaining(userEntity)
+                .orElseThrow(() -> new NoAvailableDataException(
+                        String.format("User with username %s does not have any savings", username)))
+                .stream()
+                .map(s -> this.modelMapper.map(s, SavingInfoDTO.class))
+                .toList();
     }
 
     private List<SavingInfoDTO> getByOwnerUsername(String username) {
@@ -64,17 +67,25 @@ public class SavingService {
 
     public List<SavingInfoDTO> addNewSavingAndReturnAllSavingsOfUser(CreateSavingDTO savingDTO, String username) {
 
-        createEntityAndSaveIt(savingDTO, username);
+        createEntityAndSaveIt(savingDTO);
 
         return listOfSavingInfoDTO(username);
     }
 
-    public void createEntityAndSaveIt(CreateSavingDTO addSavingDTO, String username) {
+    public void createEntityAndSaveIt(CreateSavingDTO addSavingDTO) {
 
-        SavingEntity entity = this.modelMapper.map(addSavingDTO, SavingEntity.class);
+        SavingEntity entity = SavingEntity.builder()
+                .goal(addSavingDTO.getGoal())
+                .amount(addSavingDTO.getAmount())
+                .dateOfCreation(addSavingDTO.getDateOfCreation())
+                .endDate(addSavingDTO.getEndDate())
+                .owners(new ArrayList<>())
+                .contributors(new ArrayList<>())
+                .build();
 
-        setOwners(entity, addSavingDTO.getOwners()); //todo: optimise
+        setOwners(entity, addSavingDTO.getOwners());
         setContributors(entity, addSavingDTO.getContributors());
+
 
         this.savingsRepository.saveAndFlush(entity);
     }
@@ -142,12 +153,55 @@ public class SavingService {
                     .incomeCategory(IncomeCategory.SAVINGS.name())
                     .build();
 
-            IncomeEntity closedSaving = this.modelMapper.map(closedSavingDTO, IncomeEntity.class);
-
-            entity.getOwners().forEach(o -> o.addIncome(closedSaving));
-
+            for (UserEntity owner : entity.getOwners()) {
+                this.incomeService.createEntityAndSaveIt(closedSavingDTO, owner.getUsername());
+            }
         }
 
-            this.savingsRepository.deleteById(id);
+        this.savingsRepository.deleteById(id);
+    }
+
+    public Optional<BigDecimal> savingsSum(Long id) {
+        return savingsRepository.userSavingsSum(id);
+    }
+
+    public boolean unauthorizedView(Long id, String username) {
+        SavingEntity entity = this.savingsRepository.findById(id)
+                .orElseThrow(() -> new NoAvailableDataException("User not found!"));
+
+        return !isOwner(username, entity) && !isContributor(username, entity);
+
+
+    }
+
+    private boolean isContributor(String username, SavingEntity entity) {
+        Optional<UserEntity> contributor = entity.getContributors().stream()
+                .filter(c -> c.getUsername().equals(username))
+                .findFirst();
+
+        return contributor.isPresent();
+    }
+
+    private boolean isOwner(String username, SavingEntity entity) {
+        Optional<UserEntity> owner = entity.getOwners().stream()
+                .filter(o -> o.getUsername().equals(username))
+                .findFirst();
+
+        return owner.isPresent();
+    }
+
+    public boolean unauthorizedToModify(Long id, String username) {
+
+        SavingEntity entity = this.savingsRepository.findById(id)
+                .orElseThrow(() -> new NoAvailableDataException("User not found!"));
+
+        return !isOwner(username, entity);
+    }
+
+    public EditSavingDTO getSingleSaving(Long id) {
+
+        return this.modelMapper.map(this.savingsRepository.findById(id)
+                        .orElseThrow(() -> new NoAvailableDataException("Non existent saving")),
+                EditSavingDTO.class);
     }
 }

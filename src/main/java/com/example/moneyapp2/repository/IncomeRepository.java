@@ -18,5 +18,13 @@ public interface IncomeRepository extends JpaRepository<IncomeEntity, Long> {
             """)
     Optional<BigDecimal> allIncomeSum();
 
+    @Query("""
+            SELECT SUM(e.totalPrice)
+            FROM ExpenseEntity e
+            JOIN  e.owner o
+            WHERE o.id = :id
+            """)
+    Optional<BigDecimal> userIncomeSum(Long id);
+
     Optional<List<IncomeEntity>> findByOwnerUsername(String username);
 }
