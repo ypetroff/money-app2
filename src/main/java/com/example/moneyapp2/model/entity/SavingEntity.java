@@ -35,10 +35,10 @@ public class SavingEntity extends BaseEntity {
     @Column(name = "goal", columnDefinition = "VARCHAR(255) default 'not provided by user'")
     private String goal;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     private List<UserEntity> owners;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     private List<UserEntity> contributors;
 
     public void addOwner(UserEntity owner) {

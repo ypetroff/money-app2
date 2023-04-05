@@ -1,9 +1,7 @@
 package com.example.moneyapp2.service;
 
 import com.example.moneyapp2.exception.NoAvailableDataException;
-import com.example.moneyapp2.model.dto.expense.EditExpenseDTO;
 import com.example.moneyapp2.model.dto.income.CreateIncomeDTO;
-import com.example.moneyapp2.model.dto.income.EditIncomeDTO;
 import com.example.moneyapp2.model.dto.saving.CreateSavingDTO;
 import com.example.moneyapp2.model.dto.saving.EditSavingDTO;
 import com.example.moneyapp2.model.dto.saving.SavingDetailsDTO;
@@ -169,7 +167,7 @@ public class SavingService {
         SavingEntity entity = this.savingsRepository.findById(id)
                 .orElseThrow(() -> new NoAvailableDataException("User not found!"));
 
-        return !isOwner(username, entity) && !isContributor(username, entity);
+        return isOwner(username, entity) && !isContributor(username, entity);
 
 
     }
@@ -187,7 +185,7 @@ public class SavingService {
                 .filter(o -> o.getUsername().equals(username))
                 .findFirst();
 
-        return owner.isPresent();
+        return owner.isEmpty();
     }
 
     public boolean unauthorizedToModify(Long id, String username) {
@@ -195,13 +193,25 @@ public class SavingService {
         SavingEntity entity = this.savingsRepository.findById(id)
                 .orElseThrow(() -> new NoAvailableDataException("User not found!"));
 
-        return !isOwner(username, entity);
+        return isOwner(username, entity);
     }
 
     public EditSavingDTO getSingleSaving(Long id) {
 
-        return this.modelMapper.map(this.savingsRepository.findById(id)
-                        .orElseThrow(() -> new NoAvailableDataException("Non existent saving")),
-                EditSavingDTO.class);
+        SavingEntity entity = this.savingsRepository.findById(id)
+                .orElseThrow(() -> new NoAvailableDataException("Non existent saving"));
+
+        return EditSavingDTO.builder()
+                .id(entity.getId())
+                .amount(entity.getAmount())
+                .dateOfCreation(entity.getDateOfCreation())
+                .endDate(entity.getEndDate())
+                .owners(listOfUsernames(entity.getOwners()))
+                .contributors(listOfUsernames(entity.getContributors()))
+                .build();
+    }
+
+    private List<String> listOfUsernames(List<UserEntity> entityList) {
+        return entityList.stream().map(UserEntity::getUsername).toList();
     }
 }

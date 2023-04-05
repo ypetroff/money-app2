@@ -29,12 +29,16 @@ public class SavingController {
     @PostMapping("/add")
     public ResponseEntity<?> addNewSaving(@Valid @RequestBody CreateSavingDTO savingDTO, Principal principal) {
 
-        if(savingDTO.getOwners().size() == 0 || savingDTO.getContributors().size() == 0 ||
-        savingDTO.getOwners().get(0).length() == 0 || savingDTO.getContributors().get(1).length() == 0) {
+        if(isWithoutOwnerAndContributor(savingDTO)) {
             return ResponseEntity.badRequest().body("Saving should have owner and contributor");
         }
 
         return ResponseEntity.ok(this.savingService.addNewSavingAndReturnAllSavingsOfUser(savingDTO, principal.getName()));
+    }
+
+    private static boolean isWithoutOwnerAndContributor(CreateSavingDTO savingDTO) {
+        return savingDTO.getOwners().size() == 0 || savingDTO.getContributors().size() == 0 ||
+                savingDTO.getOwners().get(0).length() == 0 || savingDTO.getContributors().get(1).length() == 0;
     }
 
     @GetMapping("/details/{id}")
