@@ -16,6 +16,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -127,6 +128,12 @@ public class IncomeService {
         return this.modelMapper.map(this.incomeRepository.findById(id)
                         .orElseThrow(() -> new NoAvailableDataException("Non existent income")),
                 EditIncomeDTO.class);
+    }
+
+    public void maintain() {
+        this.incomeRepository.findAll().stream()
+                .filter(x -> x.getCreatedOn().isAfter(LocalDateTime.now().minusYears(2)))
+                .forEach(this.incomeRepository::delete);
     }
 }
 

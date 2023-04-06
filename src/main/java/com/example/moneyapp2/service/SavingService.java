@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.MathContext;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -159,10 +160,6 @@ public class SavingService {
         this.savingsRepository.deleteById(id);
     }
 
-    public Optional<BigDecimal> savingsSum(Long id) {
-        return savingsRepository.userSavingsSum(id);
-    }
-
     public boolean unauthorizedView(Long id, String username) {
         SavingEntity entity = this.savingsRepository.findById(id)
                 .orElseThrow(() -> new NoAvailableDataException("User not found!"));
@@ -213,5 +210,11 @@ public class SavingService {
 
     private List<String> listOfUsernames(List<UserEntity> entityList) {
         return entityList.stream().map(UserEntity::getUsername).toList();
+    }
+
+    public void maintain() {
+        this.savingsRepository.findAll().stream()
+                .filter(s -> s.getEndDate().equals(LocalDate.now()))
+                .forEach(s -> deleteSaving(s.getId()));
     }
 }
