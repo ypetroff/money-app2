@@ -1,15 +1,12 @@
 package com.example.moneyapp2.service;
 
 import com.example.moneyapp2.exception.NoAvailableDataException;
-import com.example.moneyapp2.model.dto.expense.EditExpenseDTO;
 import com.example.moneyapp2.model.dto.income.CreateIncomeDTO;
 import com.example.moneyapp2.model.dto.income.EditIncomeDTO;
 import com.example.moneyapp2.model.dto.income.IncomeDetailsDTO;
 import com.example.moneyapp2.model.dto.income.IncomeInfoDTO;
-import com.example.moneyapp2.model.entity.IncomeCategoryEntity;
 import com.example.moneyapp2.model.entity.IncomeEntity;
 import com.example.moneyapp2.model.entity.user.UserEntity;
-import com.example.moneyapp2.model.enums.IncomeCategory;
 import com.example.moneyapp2.repository.IncomeRepository;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -130,9 +127,9 @@ public class IncomeService {
                 EditIncomeDTO.class);
     }
 
-    public void maintain() {
+    public void maintenance() {
         this.incomeRepository.findAll().stream()
-                .filter(x -> x.getCreatedOn().isAfter(LocalDateTime.now().minusYears(2)))
+                .filter(x -> x.getCreatedOn().isBefore(LocalDateTime.now().minusYears(2)))
                 .forEach(this.incomeRepository::delete);
     }
 }

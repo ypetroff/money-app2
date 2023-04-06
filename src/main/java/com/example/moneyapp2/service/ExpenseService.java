@@ -145,9 +145,9 @@ public class ExpenseService {
         return !entity.getOwner().getUsername().equals(username);
     }
 
-    public void maintain() {
+    public void maintenance() {
         this.expenseRepository.findAll().stream()
-                .filter(e -> e.getTimeOfPurchase().isAfter(LocalDateTime.now().minusYears(2)))
+                .filter(e -> e.getTimeOfPurchase().isBefore(LocalDateTime.now().minusYears(2)))
                 .forEach(this.expenseRepository::delete);
     }
 }

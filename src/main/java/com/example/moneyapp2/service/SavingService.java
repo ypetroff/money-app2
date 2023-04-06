@@ -51,19 +51,6 @@ public class SavingService {
                 .toList();
     }
 
-    private List<SavingInfoDTO> getByOwnerUsername(String username) {
-
-        UserEntity userEntity = this.modelMapper.map(this.userService.findUser(username), UserEntity.class);
-
-        return this.savingsRepository.findAllByOwnersContaining(userEntity)
-                .orElseThrow(() -> new NoAvailableDataException(
-                        String.format("User with username %s does not have any savings", username)))
-                .stream()
-                .map(s -> this.modelMapper.map(s, SavingInfoDTO.class))
-                .toList();
-
-    }
-
     public List<SavingInfoDTO> addNewSavingAndReturnAllSavingsOfUser(CreateSavingDTO savingDTO, String username) {
 
         createEntityAndSaveIt(savingDTO);
@@ -147,7 +134,9 @@ public class SavingService {
 
             CreateIncomeDTO closedSavingDTO = CreateIncomeDTO.builder()
                     .amount(amountPerUser)
-                    .description("Closed saving")
+                    .description(entity.getGoal().equals("not provided by user")
+                            ? "Closed saving"
+                            : String.format("Saved for %s", entity.getGoal()))
                     .createdOn(LocalDateTime.now())
                     .incomeCategory(IncomeCategory.SAVINGS.name())
                     .build();
@@ -212,7 +201,7 @@ public class SavingService {
         return entityList.stream().map(UserEntity::getUsername).toList();
     }
 
-    public void maintain() {
+    public void maintenance() {
         this.savingsRepository.findAll().stream()
                 .filter(s -> s.getEndDate().equals(LocalDate.now()))
                 .forEach(s -> deleteSaving(s.getId()));

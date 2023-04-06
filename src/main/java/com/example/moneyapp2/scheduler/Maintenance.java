@@ -17,16 +17,16 @@ public class Maintenance {
 
     @Scheduled(cron = "0 0 0 * 1-12 *")
     public void RemoveOldExpenses() {
-        this.expenseService.maintain();
+        this.expenseService.maintenance();
     }
 
     @Scheduled(cron = "0 3 0 * 1-12 *")
     public void RemoveOldIncome() {
-        this.incomeService.maintain();
+        this.incomeService.maintenance();
     }
 
     @Scheduled(cron = "0 6 0 * 1-12 *")
     public void DistributeDueSavings() {
-    this.savingService.maintain();
+        this.savingService.maintenance();
     }
 }
