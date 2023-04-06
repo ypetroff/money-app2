@@ -1,15 +1,17 @@
 package com.example.moneyapp2.model.dto.user;
 
-import com.example.moneyapp2.validation.matchingPasswordAndConfirmPassword.MatchingPasswordAndConfirmPassword;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserUpdatePasswordDTO {
 
+    @NotEmpty(message = "Old password field cannot be empty String or null")
     private String oldPassword;
 
     @NotEmpty

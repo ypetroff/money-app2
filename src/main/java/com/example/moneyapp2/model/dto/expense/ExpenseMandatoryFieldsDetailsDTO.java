@@ -1,6 +1,5 @@
 package com.example.moneyapp2.model.dto.expense;
 
-import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

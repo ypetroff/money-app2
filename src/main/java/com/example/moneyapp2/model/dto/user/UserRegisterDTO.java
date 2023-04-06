@@ -18,7 +18,6 @@ import lombok.NoArgsConstructor;
 @Builder
 public class UserRegisterDTO {
 
-
     @NotEmpty
     @Size(min = 3, message = "Password should be at least 3 characters long")
     private String password;

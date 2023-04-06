@@ -14,6 +14,8 @@ import java.math.BigDecimal;
 public class ExpenseInfoDTO {
 
     private Long id;
+
     private String name;
+
     private BigDecimal totalPrice;
 }

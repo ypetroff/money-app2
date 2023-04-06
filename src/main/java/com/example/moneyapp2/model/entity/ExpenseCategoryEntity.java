@@ -13,7 +13,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Entity
 @Table(name = "expense_categories")
-public class ExpenseCategoryEntity extends BaseEntity{
+public class ExpenseCategoryEntity extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "category")

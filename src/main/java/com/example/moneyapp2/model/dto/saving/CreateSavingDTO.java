@@ -17,7 +17,8 @@ import java.util.List;
 @Builder
 public class CreateSavingDTO {
 
-    @Digits(integer = 10, fraction = 2, message = "Incorrect amount. Check if all symbols are valid numbers and you are using a decimal point")
+    @Digits(integer = 10, fraction = 2, message = "Amount should be a valid number")
+    @Positive(message = "Amount should be a positive number")
     private BigDecimal amount;
 
     @PastOrPresent(message = "The date should be past or present")

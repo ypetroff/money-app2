@@ -15,6 +15,7 @@ import java.util.List;
 public class UserForServicesDTO {
 
     private String id;
+
     private String password;
 
     private String username;

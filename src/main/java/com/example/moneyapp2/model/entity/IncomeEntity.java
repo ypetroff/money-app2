@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 @Builder
 @Entity
 @Table(name = "incomes")
-public class IncomeEntity extends BaseEntity{
+public class IncomeEntity extends BaseEntity {
 
     @Column(name = "amount", columnDefinition = "DECIMAL(10 , 2) default 0", nullable = false)
     private BigDecimal amount;

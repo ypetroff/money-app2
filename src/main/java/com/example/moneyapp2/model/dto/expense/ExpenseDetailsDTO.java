@@ -1,8 +1,5 @@
 package com.example.moneyapp2.model.dto.expense;
 
-import jakarta.validation.constraints.Digits;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -17,6 +14,7 @@ import java.math.BigDecimal;
 public class ExpenseDetailsDTO {
 
     private Long id;
+
     private String name;
 
     private BigDecimal pricePerUnit;

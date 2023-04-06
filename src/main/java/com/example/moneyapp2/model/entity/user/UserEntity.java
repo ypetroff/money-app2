@@ -1,6 +1,7 @@
 package com.example.moneyapp2.model.entity.user;
 
-import com.example.moneyapp2.model.entity.*;
+import com.example.moneyapp2.model.entity.BaseEntity;
+import com.example.moneyapp2.model.entity.UserRoleEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

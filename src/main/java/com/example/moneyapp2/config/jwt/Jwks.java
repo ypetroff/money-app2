@@ -1,4 +1,4 @@
-package com.example.moneyapp2.config;
+package com.example.moneyapp2.config.jwt;
 
 import com.nimbusds.jose.jwk.RSAKey;
 
@@ -9,7 +9,8 @@ import java.util.UUID;
 
 public class Jwks {
 
-    private Jwks() {}
+    private Jwks() {
+    }
 
     public static RSAKey generateRsa() {
         KeyPair keyPair = KeyGeneratorUtils.generateRsaKey();

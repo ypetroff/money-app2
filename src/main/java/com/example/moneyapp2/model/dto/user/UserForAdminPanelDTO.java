@@ -1,8 +1,9 @@
 package com.example.moneyapp2.model.dto.user;
 
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 
@@ -13,8 +14,8 @@ import java.util.List;
 public class UserForAdminPanelDTO {
 
     private Long id;
-    private String username;
 
+    private String username;
 
     private List<String> roles;
 

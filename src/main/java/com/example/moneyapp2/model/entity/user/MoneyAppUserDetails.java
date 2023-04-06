@@ -12,11 +12,17 @@ import java.util.Collection;
 public class MoneyAppUserDetails implements UserDetails {
 
     private final Long id;
+
     private final String password;
+
     private final String username;
+
     private final String firstName;
+
     private final String lastName;
+
     private final String email;
+
     private final Collection<GrantedAuthority> authorities;
 
     @Override

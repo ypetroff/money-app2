@@ -24,9 +24,9 @@ public class CreateIncomeDTO {
 
     private String description;
 
-    @PastOrPresent
+    @PastOrPresent(message = "Date of creation should be in the past or the present date")
     private LocalDateTime createdOn;
 
-    @NotEmpty
+    @NotEmpty(message = "Income category cannot be empty String or null")
     private String incomeCategory;
 }

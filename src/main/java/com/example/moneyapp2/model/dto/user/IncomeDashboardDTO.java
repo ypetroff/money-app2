@@ -1,7 +1,5 @@
 package com.example.moneyapp2.model.dto.user;
 
-import com.example.moneyapp2.model.entity.IncomeCategoryEntity;
-import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

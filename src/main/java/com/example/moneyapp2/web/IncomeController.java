@@ -4,11 +4,13 @@ import com.example.moneyapp2.model.dto.income.CreateIncomeDTO;
 import com.example.moneyapp2.model.dto.income.EditIncomeDTO;
 import com.example.moneyapp2.model.dto.income.IncomeDetailsDTO;
 import com.example.moneyapp2.model.dto.income.IncomeInfoDTO;
+import com.example.moneyapp2.model.entity.user.MoneyAppUserDetails;
 import com.example.moneyapp2.service.IncomeService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
@@ -23,6 +25,7 @@ public class IncomeController {
 
     @GetMapping("/all")
     public ResponseEntity<List<IncomeInfoDTO>> allIncomeOfTheUser(Principal principal) {
+
         return ResponseEntity.ok(this.incomeService.getAllIncomeOfUser(principal.getName()));
     }
 
@@ -51,10 +54,12 @@ public class IncomeController {
                                                         Principal principal) {
 
         if(this.incomeService.IncomeNotPresent(id)) {
+
             return ResponseEntity.notFound().build();
         }
 
         if(this.incomeService.unauthorizedUser(id, principal.getName())) {
+
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
@@ -67,10 +72,12 @@ public class IncomeController {
                                                            Principal principal) {
 
         if(this.incomeService.IncomeNotPresent(id)) {
+
             return ResponseEntity.notFound().build();
         }
 
         if(this.incomeService.unauthorizedUser(id, principal.getName())) {
+
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
@@ -81,10 +88,12 @@ public class IncomeController {
     public ResponseEntity<Void> deleteIncome(@PathVariable Long id, Principal principal) {
 
         if(this.incomeService.IncomeNotPresent(id)) {
+
             return ResponseEntity.notFound().build();
         }
 
         if(this.incomeService.unauthorizedUser(id, principal.getName())) {
+
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 

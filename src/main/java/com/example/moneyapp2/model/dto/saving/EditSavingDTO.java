@@ -23,22 +23,15 @@ public class EditSavingDTO {
     @NotEmpty
     private Long id;
 
-    @Digits(integer = 10, fraction = 2)
-    @NotEmpty
     private BigDecimal amount;
 
-    @PastOrPresent
-    @NotEmpty
     private LocalDateTime dateOfCreation;
 
-    @Future
     private LocalDate endDate;
 
     private String goal;
 
-    @NotEmpty
     private List<String> owners;
 
-    @NotEmpty
     private List<String> contributors;
 }
