@@ -32,6 +32,10 @@ public class ExpenseService {
 
     public BigDecimal getExpensesOfUser(String username) {
 
+        if(this.userService.findUserEntity(username).getId() == null) {
+            throw new NoAvailableDataException("User is not present in the database");
+        }
+
         return this.expenseRepository.findByOwnerUsername(username)
                 .orElseThrow(() -> new NoAvailableDataException("Username based on Principal not found"))
                 .stream()

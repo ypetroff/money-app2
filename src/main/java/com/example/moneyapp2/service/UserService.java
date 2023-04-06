@@ -79,33 +79,6 @@ public class UserService {
         return this.userRepository.count();
     }
 
-//    public UserInfoDTO provideUserDashboardData(String username) {
-//
-//        UserEntity user = this.userRepository.findByUsername(username)
-//                .orElseThrow(() -> new NoAvailableDataException("User not found, based on principal username for user dashboard"));
-//
-//        return mapUserEntityToUserInfoDTO(user);
-//    }
-
-//    private UserInfoDTO mapUserEntityToUserInfoDTO(UserEntity user) {
-//
-//        BigDecimal userTotalIncome = this.incomeService.incomeSum(user.getId())
-//                .orElse(BigDecimal.ZERO);
-//        BigDecimal userTotalExpenses = this.expenseService.expensesSum(user.getId())
-//                .orElse(BigDecimal.ZERO);
-//        BigDecimal userTotalSavings = this.savingService.savingsSum(user.getId())
-//                .orElse(BigDecimal.ZERO);
-//
-//        return UserInfoDTO.builder()
-//                .id(user.getId())
-//                .username(user.getUsername())
-//                .income(userTotalIncome)
-//                .expenses(userTotalExpenses)
-//                .savings(userTotalSavings)
-//                .build();
-//    }
-
-
     public List<UserForAdminPanelDTO> getAllUsersForAdminPanel() {
         return this.userRepository.findAll().stream()
                 .map(u -> this.modelMapper.map(u, UserForAdminPanelDTO.class))

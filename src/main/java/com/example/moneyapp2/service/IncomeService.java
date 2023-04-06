@@ -15,7 +15,6 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -27,28 +26,32 @@ public class IncomeService {
     private final UserService userService;
     private final ModelMapper modelMapper;
 
-    public boolean isIncomeRepositoryEmpty() {
-        return this.incomeRepository.count() == 0;
-    }
 
     public BigDecimal getTotalIncomeOnTheApp() {
         return this.incomeRepository.allIncomeSum().orElse(BigDecimal.ZERO);
     }
 
     public BigDecimal getIncomeOfUser(String username) {
+
+        if(this.userService.findUserEntity(username).getId() == null) {
+            throw new NoAvailableDataException("User is not present in the database");
+        }
+
         return totalAmountBigDecimal(username);
     }
 
     private BigDecimal totalAmountBigDecimal(String username) {
         return getByOwnerUsername(username)
-                .orElseThrow(() -> new NoAvailableDataException("Username based on Principal not found"))
                 .stream()
                 .map(IncomeEntity::getAmount)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
-    private Optional<List<IncomeEntity>> getByOwnerUsername(String username) {
-        return this.incomeRepository.findByOwnerUsername(username);
+    private List<IncomeEntity> getByOwnerUsername(String username) {
+
+        return this.incomeRepository.findByOwnerUsername(username)
+                .orElseThrow(() -> new NoAvailableDataException("Username based on Principal not found"));
+
     }
 
     public   List<IncomeInfoDTO> addNewIncomeAndReturnAllIncomeOfUser(CreateIncomeDTO addIncomeDTO, String username) {
@@ -69,7 +72,6 @@ public class IncomeService {
     private List<IncomeInfoDTO> listOfIncomeInfoDTO(String username) {
 
         return getByOwnerUsername(username)
-                .orElseThrow(() -> new NoAvailableDataException("No income"))
                 .stream()
                 .map(i -> this.modelMapper.map(i, IncomeInfoDTO.class))
                 .toList();
@@ -106,10 +108,6 @@ public class IncomeService {
 
     public void deleteIncome(Long id) {
         this.incomeRepository.deleteById(id);
-    }
-
-    public Optional<BigDecimal> incomeSum(Long id) {
-        return incomeRepository.userIncomeSum(id);
     }
 
     public boolean unauthorizedUser(Long id, String username) {

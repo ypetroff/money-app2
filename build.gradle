@@ -44,6 +44,10 @@ tasks.named('test') {
 	useJUnitPlatform()
 }
 
+test {
+	systemProperty "warning.mode", "all"
+}
+
 hibernate {
 	enhancement {
 		lazyInitialization true
