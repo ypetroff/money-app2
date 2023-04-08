@@ -23,12 +23,6 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final UserRoleService userRoleService;
-
-//    private final IncomeService incomeService;
-//
-//    private final ExpenseService expenseService;
-//
-//    private final SavingService savingService;
     private final ModelMapper modelMapper;
     private final PasswordEncoder passwordEncoder;
 
@@ -41,6 +35,7 @@ public class UserService {
     }
 
     public void registerUser(UserRegisterDTO userRegisterDTO) {
+
         this.userRepository.saveAndFlush(mapToUserEntity(userRegisterDTO));
     }
 

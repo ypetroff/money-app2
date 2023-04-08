@@ -24,7 +24,7 @@ public class UserController {
     private final UserProfileService userProfileService;
 
     @GetMapping("/profile")
-    public ResponseEntity<?> userProfile(Principal principal) {
+    public ResponseEntity<UserProfileDTO> userProfile(Principal principal) {
 
         UserProfileDTO profileInfo = this.userProfileService.provideUserProfileData(principal.getName());
 

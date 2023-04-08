@@ -33,7 +33,7 @@ public class ExpenseEntity extends BaseEntity{
     @Column(name = "total_price", nullable = false)
     private BigDecimal totalPrice;
 
-    @Column(name = "date_of_purchase", columnDefinition = "TIMESTAMP default NOW() ")
+    @Column(name = "date_of_purchase", nullable = false)
     private LocalDateTime timeOfPurchase;
 
     @ManyToOne
