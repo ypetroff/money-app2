@@ -19,7 +19,7 @@ import lombok.NoArgsConstructor;
 public class UserRegisterDTO {
 
     @NotEmpty
-    @Size(min = 3, message = "Password should be at least 3 characters long")
+    @Size(min = 5, max = 24, message = "Password should be at least 3 characters long")
     private String password;
 
     @NotEmpty
@@ -34,14 +34,14 @@ public class UserRegisterDTO {
 
     @UniqueUsername
     @NotEmpty
-    @Size(min = 4, max = 15, message = "Username should be between 4 and 15 characters long")
+    @Size(min = 3, max = 23, message = "Username should be between 3 and 23 characters long")
     private String username;
 
     @NotEmpty
-    @Size(min = 3, max = 15, message = "First name should be between 4 and 15 characters long")
+    @Size(min = 3, max = 15, message = "First name should be between 3 and 15 characters long")
     private String firstName;
 
     @NotEmpty
-    @Size(min = 3, max = 15, message = "Last name should be between 4 and 15 characters long")
+    @Size(min = 3, max = 15, message = "Last name should be between 3 and 15 characters long")
     private String lastName;
 }

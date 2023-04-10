@@ -21,7 +21,6 @@ public class AdminController {
     @GetMapping("/dashboard")
     public ResponseEntity<AdminDashboardDTO> moneyAppInfo() {
 
-        //Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         return ResponseEntity.ok(this.adminService.provideAdminDashboardData());
     }
 
