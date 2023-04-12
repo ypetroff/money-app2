@@ -29,7 +29,7 @@ public class UpdateUserProfileController {
 
         UserProfileDTO updatedUser = this.userProfileService.updateUsername(principal.getName(), updateUsernameDTO.getUsername());
         Authentication authentication = this.userProfileService.authenticateUser(updatedUser.getUsername(), updateUsernameDTO.getPassword());
-        String token = this.tokenService.generateToken(authentication);
+        String token = this.tokenService.generateAccessToken(authentication);
 
         return ResponseEntity.ok(new AuthResponse(token));
     }

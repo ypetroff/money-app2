@@ -12,11 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.HashMap;
-import java.util.Map;
 
 @RequiredArgsConstructor
 @RestController
@@ -43,7 +39,7 @@ public class AuthController {
                         new UsernamePasswordAuthenticationToken(
                                 userLoginDTO.getUsername(), userLoginDTO.getPassword()));
 
-        String token = this.tokenService.generateToken(authentication);
+        String token = this.tokenService.generateAccessToken(authentication);
 
         return ResponseEntity.ok(new AuthResponse(token));
     }

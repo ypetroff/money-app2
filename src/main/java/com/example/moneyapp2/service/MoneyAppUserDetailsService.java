@@ -33,6 +33,7 @@ public class MoneyAppUserDetailsService implements UserDetailsService {
 
     private UserDetails map(UserEntity userEntity) {
         return MoneyAppUserDetails.builder()
+                .id(userEntity.getId())
                 .username(userEntity.getUsername())
                 .password(userEntity.getPassword())
                 .firstName(userEntity.getFirstName())
