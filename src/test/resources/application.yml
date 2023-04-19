@@ -1,6 +1,77 @@
+#spring:
+#  datasource:
+#    url: jdbc:h2:mem:testdb
+#    driver-class-name: org.h2.Driver
+#    username: sa
+#    password:
+#      hibernate:
+#        ddl-auto: create-drop
+#      defer-datasource-initialization: true
+#      open-in-view: 'false'
+
+#spring:
+#  jpa:
+#    properties:
+#      hibernate:
+#        dialect: org.hibernate.dialect.H2Dialect
+#        format_sql: 'TRUE'
+#    hibernate:
+#      ddl-auto: update
+#    defer-datasource-initialization: true
+#    open-in-view: 'false'
+#  datasource:
+#    driverClassName: org.h2.Driver
+#    username: sa
+#    password:
+#    url: jdbc:h2:mem:testdb.
+#  sql:
+#    init:
+#      mode: always
+#logging:
+#  level:
+#    org:
+#      hibernate:
+#        type:
+#          descriptor: TRACE
+#        SQL: DEBUG
+#      nodeValue: WARN
+#    blog: WARN
+#    springframework:
+#      security: DEBUG
+
+#spring:
+#  datasource:
+#    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;MODE=MYSQL
+#    driverClassName: org.h2.Driver
+#    initialization-mode: always
+#    data: classpath:test-data.sql
+#  jpa:
+#    hibernate:
+#      ddl-auto: create-drop
+#      defer-datasource-initialization: true
+#    generate:
+#      ddl: auto
+#    sql:
+#      init:
+#        mode: always
+
+logging:
+  level:
+    org:
+      hibernate:
+        SQL: DEBUG
+        type:
+          descriptor:
+            sql:
+              BasicBinder: TRACE
+      springframework:
+        security: DEBUG
 spring:
-  datasource:
-    url: jdbc:h2:mem:testdb
-    driver-class-name: org.h2.Driver
-    username: sa
-    password:
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+#      defer-datasource-initialization: true
+#      globally_quoted_identifiers: true
+    open-in-view: false
+    database-platform: org.hibernate.dialect.H2Dialect
+    defer-datasource-initialization: false
