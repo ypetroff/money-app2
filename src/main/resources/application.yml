@@ -12,8 +12,7 @@ spring:
     driverClassName: com.mysql.cj.jdbc.Driver
     username: root
     password: 12345
-    url:
-      jdbc :mysql://localhost:3306/money_app?allowPublicKeyRetrieval=true&useSSL=false&createDatabaseIfNotExist=true&serverTimezone=UTC
+    url: jdbc:mysql://localhost:3306/money_app?allowPublicKeyRetrieval=true&useSSL=false&createDatabaseIfNotExist=true&serverTimezone=UTC
   flyway:
     enabled: true
     locations: classpath:db/migration
