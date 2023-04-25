@@ -5,7 +5,7 @@ spring:
         dialect: org.hibernate.dialect.MySQL8Dialect
         format_sql: 'TRUE'
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: none
     defer-datasource-initialization: false
     open-in-view: 'false'
   datasource:

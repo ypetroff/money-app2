@@ -4,6 +4,7 @@ import com.example.moneyapp2.model.entity.BaseEntity;
 import com.example.moneyapp2.model.entity.UserRoleEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -13,6 +14,7 @@ import java.util.List;
 @Getter
 @Setter
 @AllArgsConstructor
+@Builder
 @Entity
 @Table(name = "users")
 public class UserEntity extends BaseEntity {

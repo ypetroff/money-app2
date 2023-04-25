@@ -103,11 +103,13 @@ public class UserService {
 
     public void removeAdminRights(Long id) {
 
-        UserEntity entity = this.userRepository.findById(id)
-                .orElseThrow(() -> new NoAvailableDataException("User not found"));
+        if(id != 1) {
+            UserEntity entity = this.userRepository.findById(id)
+                    .orElseThrow(() -> new NoAvailableDataException("User not found"));
 
-        entity.removeRole(this.userRoleService.getRole(UserRole.ADMIN));
+            entity.removeRole(this.userRoleService.getRole(UserRole.ADMIN));
 
-        this.userRepository.saveAndFlush(entity);
+            this.userRepository.saveAndFlush(entity);
+        }
     }
 }

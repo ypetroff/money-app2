@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -55,9 +56,9 @@ class AdminServiceTest {
 
         AdminDashboardDTO adminDashboardDTO = toTest.provideAdminDashboardData();
 
-        Assertions.assertNotNull(adminDashboardDTO);
-        Assertions.assertEquals(user.getId(), adminDashboardDTO.getUsers().get(0).getId());
-        Assertions.assertEquals(BigDecimal.TEN, adminDashboardDTO.getTotalIncome());
+        assertNotNull(adminDashboardDTO);
+        assertEquals(user.getId(), adminDashboardDTO.getUsers().get(0).getId());
+        assertEquals(BigDecimal.TEN, adminDashboardDTO.getTotalIncome());
         assertEquals(1, (long) adminDashboardDTO.getTotalUsersCount());
     }
 
@@ -75,8 +76,8 @@ class AdminServiceTest {
 
         AdminDashboardDTO adminDashboardDTO = toTest.provideAdminDashboardData();
 
-        Assertions.assertEquals(BigDecimal.ZERO, adminDashboardDTO.getTotalIncome());
-        Assertions.assertEquals(BigDecimal.ZERO, adminDashboardDTO.getTotalExpenses());
-        Assertions.assertEquals(0, adminDashboardDTO.getUsers().size());
+        assertEquals(BigDecimal.ZERO, adminDashboardDTO.getTotalIncome());
+        assertEquals(BigDecimal.ZERO, adminDashboardDTO.getTotalExpenses());
+        assertEquals(0, adminDashboardDTO.getUsers().size());
     }
 }

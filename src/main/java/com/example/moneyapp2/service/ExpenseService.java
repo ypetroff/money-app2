@@ -60,10 +60,10 @@ public class ExpenseService {
         this.expenseRepository.saveAndFlush(entity);
     }
 
-    private void setOwnerAndCategory(ExpenseEntity entity, String username, String addExpenseDTO) {
+    private void setOwnerAndCategory(ExpenseEntity entity, String username, String category) {
 
         entity.setOwner(this.modelMapper.map(this.userService.findUser(username), UserEntity.class));
-        entity.setCategory(this.expenseCategoryService.addCategory(addExpenseDTO));
+        entity.setCategory(this.expenseCategoryService.addCategory(category));
     }
 
     private static LocalDateTime getTimeOfPurchase() {
