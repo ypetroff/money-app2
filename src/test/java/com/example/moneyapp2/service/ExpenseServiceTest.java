@@ -1,6 +1,7 @@
 package com.example.moneyapp2.service;
 
 import com.example.moneyapp2.exception.NoAvailableDataException;
+import com.example.moneyapp2.model.dto.expense.ExpenseInfoDTO;
 import com.example.moneyapp2.model.entity.ExpenseEntity;
 import com.example.moneyapp2.model.entity.user.UserEntity;
 import com.example.moneyapp2.repository.ExpenseRepository;
@@ -13,6 +14,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -128,6 +130,7 @@ class ExpenseServiceTest {
                 .owner(testUser)
                 .build();
 
+
         when(this.mockExpenseRepository.saveAndFlush(testExpense))
                 .thenReturn(testExpense);
 
@@ -137,11 +140,43 @@ class ExpenseServiceTest {
     }
 
     @Test
-    void testCreateEntityAndSaveIt() {
-    }
-
-    @Test
     void getAllExpensesOfUser() {
+
+        UserEntity testUser = UserEntity.builder()
+                .username("test")
+                .build();
+
+        ExpenseEntity testExpense = ExpenseEntity.builder()
+                .name("test expense")
+                .category(this.mockExpenseCategoryService.addCategory("HOME"))
+                .totalPrice(BigDecimal.TEN)
+                .timeOfPurchase(LocalDateTime.of(1999, 3, 23, 12, 0, 0))
+                .owner(testUser)
+                .build();
+        testExpense.setId(1L);
+
+        ExpenseInfoDTO dtoExpense = ExpenseInfoDTO.builder()
+                .id(testExpense.getId())
+                .name(testExpense.getName())
+                .totalPrice(testExpense.getTotalPrice())
+                .build();
+
+        doReturn(Optional.of(
+                List.of(testExpense)))
+                .when(this.mockExpenseRepository).findByOwnerUsername(testUser.getUsername());
+
+        when(this.mockModelMapper.map(testExpense, ExpenseInfoDTO.class))
+                .thenReturn(dtoExpense);
+
+        List<ExpenseInfoDTO> listOfExpensesFromMethod = toTest.getAllExpensesOfUser("test");
+
+        assertEquals(1, listOfExpensesFromMethod.size());
+
+        ExpenseInfoDTO actual = listOfExpensesFromMethod.get(0);
+
+        assertEquals(testExpense.getId(),actual.getId());
+        assertEquals(testExpense.getTotalPrice(), actual.getTotalPrice());
+        assertEquals(testExpense.getName(), actual.getName());
     }
 
     @Test

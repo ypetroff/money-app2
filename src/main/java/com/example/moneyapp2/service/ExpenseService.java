@@ -47,6 +47,7 @@ public class ExpenseService {
 
         ExpenseEntity entity = this.modelMapper.map(addExpenseDTO, ExpenseEntity.class);
         setOwnerAndCategory(entity, username, addExpenseDTO.getCategory());
+        entity.setTimeOfPurchase(getTimeOfPurchase());
 
         this.expenseRepository.saveAndFlush(entity);
     }
