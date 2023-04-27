@@ -1,9 +1,11 @@
 package com.example.moneyapp2.service;
 
 import com.example.moneyapp2.exception.NoAvailableDataException;
-import com.example.moneyapp2.model.dto.expense.ExpenseInfoDTO;
+import com.example.moneyapp2.model.dto.expense.*;
+import com.example.moneyapp2.model.entity.ExpenseCategoryEntity;
 import com.example.moneyapp2.model.entity.ExpenseEntity;
 import com.example.moneyapp2.model.entity.user.UserEntity;
+import com.example.moneyapp2.model.enums.ExpenseCategory;
 import com.example.moneyapp2.repository.ExpenseRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -122,21 +124,55 @@ class ExpenseServiceTest {
     @Test
     void createEntityAndSaveIt() {
 
-        UserEntity testUser = new UserEntity();
-        testUser.setId(1L);
-        testUser.setUsername("test");
-
-        ExpenseEntity testExpense = ExpenseEntity.builder()
-                .owner(testUser)
+        CreateExpenseDTO expenseDTO = CreateExpenseDTO.builder()
+                .name("name")
+                .category("CAR")
+                .numberOfUnits(1)
+                .pricePerUnit(BigDecimal.TEN)
+                .totalPrice(BigDecimal.TEN)
                 .build();
 
+        String username = "test";
 
-        when(this.mockExpenseRepository.saveAndFlush(testExpense))
-                .thenReturn(testExpense);
 
-        this.mockExpenseRepository.saveAndFlush(testExpense);
+        when(this.mockModelMapper.map(expenseDTO, ExpenseEntity.class))
+                .thenReturn(ExpenseEntity.builder()
+                        .name(expenseDTO.getName())
+                        .category(new ExpenseCategoryEntity(ExpenseCategory.valueOf(expenseDTO.getCategory())))
+                        .numberOfUnits(expenseDTO.getNumberOfUnits())
+                        .pricePerUnit(expenseDTO.getPricePerUnit())
+                        .totalPrice(expenseDTO.getTotalPrice())
+                        .build());
 
+
+        toTest.createEntityAndSaveIt(expenseDTO, username);
         verify(this.mockExpenseRepository).saveAndFlush(any());
+
+    }
+
+    @Test
+    void createEntityAndSaveItWithMandatoryFields() {
+
+        CreateExpenseMandatoryFieldsDTO expenseDTO = CreateExpenseMandatoryFieldsDTO.builder()
+                .name("name")
+                .category("CAR")
+                .totalPrice(BigDecimal.TEN)
+                .build();
+
+        String username = "test";
+
+
+        when(this.mockModelMapper.map(expenseDTO, ExpenseEntity.class))
+                .thenReturn(ExpenseEntity.builder()
+                        .name(expenseDTO.getName())
+                        .category(new ExpenseCategoryEntity(ExpenseCategory.valueOf(expenseDTO.getCategory())))
+                        .totalPrice(expenseDTO.getTotalPrice())
+                        .build());
+
+
+        toTest.createEntityAndSaveIt(expenseDTO, username);
+        verify(this.mockExpenseRepository).saveAndFlush(any());
+
     }
 
     @Test
@@ -180,7 +216,90 @@ class ExpenseServiceTest {
     }
 
     @Test
-    void getDetailsOfExpense() {
+    void getAllExpensesOfUserWithoutExpenses() {
+
+        UserEntity testUser = UserEntity.builder()
+                .username("test")
+                .build();
+
+        List<ExpenseEntity> entities = new ArrayList<>();
+
+        doReturn(Optional.of(entities))
+                .when(this.mockExpenseRepository).findByOwnerUsername(testUser.getUsername());
+
+
+        List<ExpenseInfoDTO> listOfExpensesFromMethod = toTest.getAllExpensesOfUser("test");
+
+        assertEquals(0, listOfExpensesFromMethod.size());
+    }
+
+    @Test
+    void getDetailsOfExpenseMandatoryFields() {
+        ExpenseEntity testExpense = ExpenseEntity.builder()
+                .name("test expense")
+                .category(new ExpenseCategoryEntity(ExpenseCategory.HOME))
+                .totalPrice(BigDecimal.TEN)
+                .timeOfPurchase(LocalDateTime.of(1999, 3, 23, 12, 0, 0))
+                .build();
+        testExpense.setId(1L);
+
+        when(this.mockExpenseRepository.findById(1L))
+                .thenReturn(Optional.of(testExpense));
+        when(this.mockModelMapper.map(testExpense, ExpenseMandatoryFieldsDetailsDTO.class))
+                .thenReturn(ExpenseMandatoryFieldsDetailsDTO.builder()
+                        .category(testExpense.getCategory().toString())
+                        .name(testExpense.getName())
+                        .timeOfPurchase(testExpense.getTimeOfPurchase())
+                        .totalPrice(testExpense.getTotalPrice())
+                        .build());
+
+        ExpenseMandatoryFieldsDetailsDTO detailsOfExpense =
+                (ExpenseMandatoryFieldsDetailsDTO) this.toTest.getDetailsOfExpense(testExpense.getId());
+
+        assertEquals(testExpense.getTotalPrice(), detailsOfExpense.getTotalPrice());
+        assertEquals(testExpense.getName(), detailsOfExpense.getName());
+        assertEquals(testExpense.getCategory().toString(), detailsOfExpense.getCategory());
+    }
+
+    @Test
+    void getDetailsOfExpenseAllFields() {
+        ExpenseEntity testExpense = ExpenseEntity.builder()
+                .name("test expense")
+                .category(new ExpenseCategoryEntity(ExpenseCategory.HOME))
+                .numberOfUnits(1)
+                .pricePerUnit(BigDecimal.TEN)
+                .totalPrice(BigDecimal.TEN)
+                .timeOfPurchase(LocalDateTime.of(1999, 3, 23, 12, 0, 0))
+                .build();
+        testExpense.setId(1L);
+
+        when(this.mockExpenseRepository.findById(1L))
+                .thenReturn(Optional.of(testExpense));
+        when(this.mockModelMapper.map(testExpense, ExpenseDetailsDTO.class))
+                .thenReturn(ExpenseDetailsDTO.builder()
+                        .category(testExpense.getCategory().toString())
+                        .name(testExpense.getName())
+                        .numberOfUnits(testExpense.getNumberOfUnits())
+                        .pricePerUnit(testExpense.getPricePerUnit())
+                        .timeOfPurchase(testExpense.getTimeOfPurchase())
+                        .totalPrice(testExpense.getTotalPrice())
+                        .build());
+
+        ExpenseDetailsDTO detailsOfExpense =
+                (ExpenseDetailsDTO) this.toTest.getDetailsOfExpense(testExpense.getId());
+
+        assertEquals(testExpense.getNumberOfUnits(), detailsOfExpense.getNumberOfUnits());
+        assertEquals(testExpense.getPricePerUnit(), detailsOfExpense.getPricePerUnit());
+        assertEquals(testExpense.getTotalPrice(), detailsOfExpense.getTotalPrice());
+        assertEquals(testExpense.getName(), detailsOfExpense.getName());
+        assertEquals(testExpense.getCategory().toString(), detailsOfExpense.getCategory());
+    }
+
+    @Test
+    void getDetailsOfThrowsIfIdIsInvalid() {
+        long id = 1;
+
+        assertThrows(NoAvailableDataException.class, () -> toTest.getDetailsOfExpense(id));
     }
 
     @Test

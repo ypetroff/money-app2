@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor
@@ -23,7 +24,7 @@ public class ExpenseDetailsDTO {
 
     private BigDecimal totalPrice;
 
-    private String timeOfPurchase;
+    private LocalDateTime timeOfPurchase;
 
     private String category;
 }
