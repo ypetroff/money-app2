@@ -2,18 +2,19 @@ package com.example.moneyapp2.service;
 
 import com.example.moneyapp2.exception.NoAvailableDataException;
 import com.example.moneyapp2.model.dto.expense.*;
+import com.example.moneyapp2.model.dto.user.UserForServicesDTO;
 import com.example.moneyapp2.model.entity.ExpenseCategoryEntity;
 import com.example.moneyapp2.model.entity.ExpenseEntity;
 import com.example.moneyapp2.model.entity.user.UserEntity;
 import com.example.moneyapp2.model.enums.ExpenseCategory;
 import com.example.moneyapp2.repository.ExpenseRepository;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -85,8 +86,6 @@ class ExpenseServiceTest {
         List<ExpenseEntity> expenses = new ArrayList<>();
         expenses.add(testExpense);
 
-        when(this.mockUserService.findUserEntity(testUser.getUsername()))
-                .thenReturn(testUser);
         when(this.mockExpenseRepository.findByOwnerUsername(testUser.getUsername()))
                 .thenReturn(Optional.of(expenses));
 
@@ -102,8 +101,6 @@ class ExpenseServiceTest {
 
         List<ExpenseEntity> expenses = new ArrayList<>();
 
-        when(this.mockUserService.findUserEntity(testUser.getUsername()))
-                .thenReturn(testUser);
         when(this.mockExpenseRepository.findByOwnerUsername(testUser.getUsername()))
                 .thenReturn(Optional.of(expenses));
 
@@ -113,16 +110,13 @@ class ExpenseServiceTest {
     @Test
     void getExpensesOfNonExistingUser() {
 
-        String testUsername = "test";
+        String username = "test";
 
-        when(this.mockUserService.findUserEntity(testUsername))
-                .thenReturn(new UserEntity());
-
-        assertThrows(NoAvailableDataException.class, () -> toTest.getExpensesOfUser(testUsername));
+        assertThrows(NoAvailableDataException.class, () -> toTest.getExpensesOfUser(username));
     }
 
     @Test
-    void createEntityAndSaveIt() {
+    void createEntityAndSaveItWithAllFields() {
 
         CreateExpenseDTO expenseDTO = CreateExpenseDTO.builder()
                 .name("name")
@@ -143,11 +137,34 @@ class ExpenseServiceTest {
                         .pricePerUnit(expenseDTO.getPricePerUnit())
                         .totalPrice(expenseDTO.getTotalPrice())
                         .build());
-
+        when(this.mockUserService.findUser(username))
+                .thenReturn(new UserForServicesDTO());
 
         toTest.createEntityAndSaveIt(expenseDTO, username);
         verify(this.mockExpenseRepository).saveAndFlush(any());
 
+    }
+
+    @Test
+    void createEntityAndSaveItWithAllFieldsThrowsUserNotFound() {
+
+        String username = "test";
+        String errorMessage = "test is not present in the database. The variable was extracted from the Principal";
+
+        UsernameNotFoundException exception = assertThrows(UsernameNotFoundException.class,
+                () -> toTest.createEntityAndSaveIt(new CreateExpenseDTO(), username));
+        assertEquals(errorMessage, exception.getMessage());
+    }
+
+    @Test
+    void createEntityAndSaveItWithMandatoryFieldsThrowsUserNotFound() {
+
+        String username = "test";
+        String errorMessage = "test is not present in the database. The variable was extracted from the Principal";
+
+        UsernameNotFoundException exception = assertThrows(UsernameNotFoundException.class,
+                () -> toTest.createEntityAndSaveIt(new CreateExpenseDTO(), username));
+        assertEquals(errorMessage, exception.getMessage());
     }
 
     @Test
@@ -168,6 +185,8 @@ class ExpenseServiceTest {
                         .category(new ExpenseCategoryEntity(ExpenseCategory.valueOf(expenseDTO.getCategory())))
                         .totalPrice(expenseDTO.getTotalPrice())
                         .build());
+        when(this.mockUserService.findUser(username))
+                .thenReturn(new UserForServicesDTO());
 
 
         toTest.createEntityAndSaveIt(expenseDTO, username);
@@ -203,6 +222,8 @@ class ExpenseServiceTest {
 
         when(this.mockModelMapper.map(testExpense, ExpenseInfoDTO.class))
                 .thenReturn(dtoExpense);
+        when(this.mockUserService.findUser(testUser.getUsername()))
+                .thenReturn(new UserForServicesDTO());
 
         List<ExpenseInfoDTO> listOfExpensesFromMethod = toTest.getAllExpensesOfUser("test");
 
@@ -226,7 +247,8 @@ class ExpenseServiceTest {
 
         doReturn(Optional.of(entities))
                 .when(this.mockExpenseRepository).findByOwnerUsername(testUser.getUsername());
-
+        when(this.mockUserService.findUser(testUser.getUsername()))
+                .thenReturn(new UserForServicesDTO());
 
         List<ExpenseInfoDTO> listOfExpensesFromMethod = toTest.getAllExpensesOfUser("test");
 
@@ -303,7 +325,9 @@ class ExpenseServiceTest {
     }
 
     @Test
-    void addNewExpenseAndReturnAllIncomeOfUser() {
+    void addNewExpenseAndReturnAllIncomeOfUserIT() {
+        createEntityAndSaveItWithAllFields();
+        getAllExpensesOfUserWithoutExpenses();
     }
 
     @Test

@@ -7,6 +7,7 @@ import com.example.moneyapp2.model.entity.user.UserEntity;
 import com.example.moneyapp2.repository.ExpenseRepository;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -31,11 +32,6 @@ public class ExpenseService {
     }
 
     public BigDecimal getExpensesOfUser(String username) {
-
-        if(this.userService.findUserEntity(username).getId() == null) {
-            throw new NoAvailableDataException("User is not present in the database");
-        }
-
         return this.expenseRepository.findByOwnerUsername(username)
                 .orElseThrow(() -> new NoAvailableDataException("Username based on Principal not found"))
                 .stream()
@@ -45,6 +41,8 @@ public class ExpenseService {
 
     public void createEntityAndSaveIt(CreateExpenseDTO addExpenseDTO, String username) {
 
+        verifyUser(username);
+
         ExpenseEntity entity = this.modelMapper.map(addExpenseDTO, ExpenseEntity.class);
         setOwnerAndCategory(entity, username, addExpenseDTO.getCategory());
         entity.setTimeOfPurchase(getTimeOfPurchase());
@@ -52,7 +50,15 @@ public class ExpenseService {
         this.expenseRepository.saveAndFlush(entity);
     }
 
+    private void verifyUser(String username) {
+        if(this.userService.findUser(username) == null) {
+            throw new UsernameNotFoundException(String.format("%s is not present in the database. The variable was extracted from the Principal", username));
+        }
+    }
+
     public void createEntityAndSaveIt(CreateExpenseMandatoryFieldsDTO addExpenseDTO, String username) {
+
+        verifyUser(username);
 
         ExpenseEntity entity = this.modelMapper.map(addExpenseDTO, ExpenseEntity.class);
         setOwnerAndCategory(entity, username, addExpenseDTO.getCategory());
@@ -72,7 +78,7 @@ public class ExpenseService {
     }
 
     public List<ExpenseInfoDTO> getAllExpensesOfUser(String username) {
-
+        verifyUser(username);
         return listOfExpenseInfoDTO(username);
     }
 
@@ -93,20 +99,20 @@ public class ExpenseService {
 
     public List<ExpenseInfoDTO> addNewExpenseAndReturnAllIncomeOfUser(CreateExpenseDTO expenseDTO,
                                                                       String username) {
+        verifyUser(username);
         createEntityAndSaveIt(expenseDTO, username);
-
         return listOfExpenseInfoDTO(username);
     }
 
     public List<ExpenseInfoDTO> addNewExpenseAndReturnAllIncomeOfUser(CreateExpenseMandatoryFieldsDTO expenseDTO,
                                                                       String username) {
+        verifyUser(username);
         createEntityAndSaveIt(expenseDTO, username);
-
         return listOfExpenseInfoDTO(username);
     }
 
     private List<ExpenseInfoDTO> listOfExpenseInfoDTO(String username) {
-
+        verifyUser(username);
         return this.expenseRepository.findByOwnerUsername(username)
                 .orElseThrow(() -> new NoAvailableDataException("User don't have expenses"))
                 .stream()
@@ -143,7 +149,7 @@ public class ExpenseService {
     }
 
     public boolean unauthorizedUser(Long id, String username) {
-
+        verifyUser(username);
         ExpenseEntity entity = this.expenseRepository.findById(id)
                 .orElseThrow(() -> new NoAvailableDataException("Non existent expense"));
 
