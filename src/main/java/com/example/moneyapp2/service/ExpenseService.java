@@ -51,7 +51,7 @@ public class ExpenseService {
     }
 
     private void verifyUser(String username) {
-        if(this.userService.findUser(username) == null) {
+        if (this.userService.findUser(username) == null) {
             throw new UsernameNotFoundException(String.format("%s is not present in the database. The variable was extracted from the Principal", username));
         }
     }

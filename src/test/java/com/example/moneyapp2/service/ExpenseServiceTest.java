@@ -7,6 +7,7 @@ import com.example.moneyapp2.model.entity.ExpenseCategoryEntity;
 import com.example.moneyapp2.model.entity.ExpenseEntity;
 import com.example.moneyapp2.model.entity.user.UserEntity;
 import com.example.moneyapp2.model.enums.ExpenseCategory;
+import com.example.moneyapp2.repository.ExpenseCategoryRepository;
 import com.example.moneyapp2.repository.ExpenseRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -22,13 +23,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class ExpenseServiceTest {
-
 
     @Mock
     private ExpenseRepository mockExpenseRepository;
@@ -47,7 +46,7 @@ class ExpenseServiceTest {
     @BeforeEach
     void setUp() {
         toTest = new ExpenseService(this.mockExpenseRepository, this.mockExpenseCategoryService,
-                                    this.mockUserService, this.mockModelMapper);
+                this.mockUserService, this.mockModelMapper);
     }
 
     @Test
@@ -231,7 +230,7 @@ class ExpenseServiceTest {
 
         ExpenseInfoDTO actual = listOfExpensesFromMethod.get(0);
 
-        assertEquals(testExpense.getId(),actual.getId());
+        assertEquals(testExpense.getId(), actual.getId());
         assertEquals(testExpense.getTotalPrice(), actual.getTotalPrice());
         assertEquals(testExpense.getName(), actual.getName());
     }
@@ -325,29 +324,102 @@ class ExpenseServiceTest {
     }
 
     @Test
-    void addNewExpenseAndReturnAllIncomeOfUserIT() {
-        createEntityAndSaveItWithAllFields();
-        getAllExpensesOfUserWithoutExpenses();
-    }
+    void editExpenseWithValidId() {
+        CreateExpenseDTO editInfo = CreateExpenseDTO.builder()
+                .name("new_name")
+                .category("CAR")
+                .numberOfUnits(1)
+                .pricePerUnit(BigDecimal.TEN)
+                .totalPrice(BigDecimal.TEN)
+                .timeOfPurchase(LocalDateTime.of(2000, 2,
+                        22, 22, 22, 22))
+                .build();
 
-    @Test
-    void testAddNewExpenseAndReturnAllIncomeOfUser() {
+        ExpenseEntity entity = ExpenseEntity.builder()
+                .name("original_name")
+                .category(new ExpenseCategoryEntity(ExpenseCategory.CAR))
+                .owner(new UserEntity())
+                .numberOfUnits(2)
+                .pricePerUnit(BigDecimal.ONE)
+                .totalPrice(BigDecimal.TWO)
+                .timeOfPurchase(LocalDateTime.of(2000, 2,
+                        22, 22, 22, 22))
+                .build();
+        entity.setId(1L);
+
+        when(this.mockExpenseRepository.findById(entity.getId()))
+                .thenReturn(Optional.of(entity));
+        doAnswer(invocation -> {
+            ExpenseEntity e = invocation.getArgument(1);
+            e.setName(editInfo.getName());
+            e.setCategory(new ExpenseCategoryEntity(ExpenseCategory.valueOf(editInfo.getCategory())));
+            e.setNumberOfUnits(editInfo.getNumberOfUnits());
+            e.setPricePerUnit(editInfo.getPricePerUnit());
+            e.setTotalPrice(editInfo.getTotalPrice());
+            e.setTimeOfPurchase(editInfo.getTimeOfPurchase());
+            return null;
+        })
+                .when(this.mockModelMapper).map(editInfo, entity);
+
+        doReturn(ExpenseDetailsDTO.builder()
+                .id(entity.getId())
+                .name(editInfo.getName())
+                .category(editInfo.getCategory())
+                .numberOfUnits(editInfo.getNumberOfUnits())
+                .pricePerUnit(editInfo.getPricePerUnit())
+                .totalPrice(editInfo.getTotalPrice())
+                .timeOfPurchase(editInfo.getTimeOfPurchase())
+                .build())
+                .when(this.mockModelMapper).map(entity, ExpenseDetailsDTO.class);
+
+        ExpenseDetailsDTO expenseDetailsDTO = toTest.editExpense(entity.getId(), editInfo);
+        verify(this.mockExpenseRepository).findById(1L);
+        verify(this.mockModelMapper).map(editInfo, entity);
+        verify(this.mockExpenseRepository).saveAndFlush(entity);
+        verify(this.mockModelMapper).map(entity, ExpenseDetailsDTO.class);
+
+        assertEquals(editInfo.getName(), expenseDetailsDTO.getName());
+        assertEquals(editInfo.getNumberOfUnits(), expenseDetailsDTO.getNumberOfUnits());
+        assertEquals(editInfo.getPricePerUnit(), expenseDetailsDTO.getPricePerUnit());
+        assertEquals(editInfo.getTotalPrice(), expenseDetailsDTO.getTotalPrice());
     }
 
     @Test
     void editExpense() {
+        Long id = 1L;
+        String errorMessage = String.format("Expense with id: %d not found", id);
+
+        NoAvailableDataException exception =
+                assertThrows(NoAvailableDataException.class, () -> toTest.editExpense(id, new CreateExpenseDTO()));
+        assertEquals(errorMessage, exception.getMessage());
     }
 
     @Test
-    void expenseNotPresent() {
+    void expenseNotPresentReturnsTrue() {
+        assertTrue(toTest.expenseNotPresent(1L));
+    }
+
+    @Test
+    void expenseNotPresentReturnsFalse() {
+        when(this.mockExpenseRepository.existsById(1L))
+                .thenReturn(true);
+
+        assertFalse(toTest.expenseNotPresent(1L));
     }
 
     @Test
     void deleteExpense() {
+        toTest.deleteExpense(1L);
+        verify(this.mockExpenseRepository).deleteById(1L);
     }
 
     @Test
-    void getSingleExpense() {
+    void getSingleExpenseWithValidId() {
+
+    }
+
+    @Test
+    void getSingleExpenseThrowsWithInvalidId() {
     }
 
     @Test
