@@ -415,15 +415,107 @@ class ExpenseServiceTest {
 
     @Test
     void getSingleExpenseWithValidId() {
+        long id = 1L;
+        ExpenseEntity entity = ExpenseEntity.builder()
+                .name("test")
+                .category(new ExpenseCategoryEntity(ExpenseCategory.CAR))
+                .owner(new UserEntity())
+                .numberOfUnits(2)
+                .pricePerUnit(BigDecimal.ONE)
+                .totalPrice(BigDecimal.TWO)
+                .timeOfPurchase(LocalDateTime.of(2000, 2,
+                        22, 22, 22, 22))
+                .build();
+        entity.setId(id);
+        EditExpenseDTO dto = EditExpenseDTO.builder()
+                .id(entity.getId())
+                .name(entity.getName())
+                .category(entity.getCategory().toString())
+                .numberOfUnits(entity.getNumberOfUnits())
+                .pricePerUnit(entity.getPricePerUnit())
+                .totalPrice(entity.getTotalPrice())
+                .timeOfPurchase(entity.getTimeOfPurchase().toString())
+                .build();
 
+        when(this.mockExpenseRepository.findById(id))
+                .thenReturn(Optional.of(entity));
+        when(this.mockModelMapper.map(entity, EditExpenseDTO.class))
+                .thenReturn(dto);
+
+        toTest.getSingleExpense(id);
+
+        verify(this.mockExpenseRepository).findById(id);
+
+        assertEquals(entity.getId(), dto.getId());
+        assertEquals(entity.getName(), dto.getName());
+        assertEquals(entity.getCategory().toString(), dto.getCategory());
+        assertEquals(entity.getNumberOfUnits(), dto.getNumberOfUnits());
+        assertEquals(entity.getPricePerUnit(), dto.getPricePerUnit());
+        assertEquals(entity.getTotalPrice(), dto.getTotalPrice());
+        assertEquals(entity.getTimeOfPurchase().toString(), dto.getTimeOfPurchase());
     }
 
     @Test
     void getSingleExpenseThrowsWithInvalidId() {
+        assertThrows(NoAvailableDataException.class, () -> toTest.getSingleExpense(1L));
     }
 
     @Test
-    void unauthorizedUser() {
+    void unauthorizedUserReturnsFalse() {
+        String username = "username";
+        long id = 1L;
+
+        ExpenseEntity entity = ExpenseEntity.builder()
+                .owner(UserEntity.builder()
+                        .username(username)
+                        .build())
+                .build();
+
+        when(this.mockUserService.findUser(username))
+                .thenReturn(new UserForServicesDTO());
+        when(this.mockExpenseRepository.findById(id))
+                .thenReturn(Optional.of(entity));
+
+        assertFalse(toTest.unauthorizedUser(id, username));
+    }
+
+    @Test
+    void unauthorizedUserReturnsTrue() {
+        String username = "username";
+        long id = 1L;
+
+        UserEntity user = UserEntity.builder()
+                .username("test")
+                .build();
+
+        ExpenseEntity entity = ExpenseEntity.builder()
+                .owner(user)
+                .build();
+
+        when(this.mockUserService.findUser(username))
+                .thenReturn(new UserForServicesDTO());
+        when(this.mockExpenseRepository.findById(id))
+                .thenReturn(Optional.of(entity));
+
+        assertTrue(toTest.unauthorizedUser(id, username));
+    }
+
+    @Test
+    void unauthorizedUserThrowsUsernameNotFound() {
+        String username = "username";
+        long id = 1L;
+        assertThrows(UsernameNotFoundException.class, () -> toTest.unauthorizedUser(id, username));
+    }
+
+    @Test
+    void unauthorizedUserThrowsNoAvlData() {
+        String username = "username";
+        long id = 1L;
+
+        when(this.mockUserService.findUser(username))
+                .thenReturn(new UserForServicesDTO());
+
+        assertThrows(NoAvailableDataException.class, () -> toTest.unauthorizedUser(id, username));
     }
 
     @Test
