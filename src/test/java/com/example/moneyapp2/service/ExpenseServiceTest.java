@@ -520,5 +520,129 @@ class ExpenseServiceTest {
 
     @Test
     void maintenance() {
+        ExpenseEntity entityToRemain = ExpenseEntity.builder()
+                .timeOfPurchase(LocalDateTime.of(2022, 2,
+                        22, 22, 22, 22))
+                .build();
+        ExpenseEntity entityToBeDeleted = ExpenseEntity.builder()
+                .timeOfPurchase(LocalDateTime.of(2000, 2,
+                        22, 22, 22, 22))
+                .build();
+
+        when(this.mockExpenseRepository.findAll())
+                .thenReturn(List.of(entityToRemain, entityToBeDeleted));
+
+        toTest.maintenance();
+
+        verify(this.mockExpenseRepository).findAll();
     }
+
+    @Test
+    void addNewExpenseAndReturnAllIncomeOfUserAllFields() {
+        String username = "username";
+        CreateExpenseDTO expenseDTO = CreateExpenseDTO.builder()
+                .name("name")
+                .category(ExpenseCategory.HEALTH.name())
+                .numberOfUnits(1)
+                .pricePerUnit(BigDecimal.ONE)
+                .totalPrice(BigDecimal.ONE)
+                .timeOfPurchase(LocalDateTime.of(2022, 2,
+                        22, 22, 22, 22))
+                .build();
+
+        ExpenseEntity entity = ExpenseEntity.builder()
+                .name("name")
+                .category(new ExpenseCategoryEntity(ExpenseCategory.HEALTH))
+                .owner(new UserEntity())
+                .numberOfUnits(1)
+                .pricePerUnit(BigDecimal.ONE)
+                .totalPrice(BigDecimal.ONE)
+                .timeOfPurchase(LocalDateTime.of(2022, 2,
+                        22, 22, 22, 22))
+                .build();
+        UserForServicesDTO userForServicesDTO = UserForServicesDTO.builder()
+                .id(1L)
+                .username(username)
+                .build();
+        entity.setId(1L);
+
+        doReturn(userForServicesDTO)
+                .when(this.mockUserService).findUser(username);
+        doReturn(entity)
+                .when(this.mockModelMapper).map(expenseDTO, ExpenseEntity.class);
+        doReturn(new UserEntity())
+                .when(this.mockModelMapper).map(userForServicesDTO, UserEntity.class);
+        when(this.mockExpenseCategoryService.addCategory(ExpenseCategory.HEALTH.name()))
+                .thenReturn(new ExpenseCategoryEntity(ExpenseCategory.HEALTH));
+        when(this.mockExpenseRepository.findByOwnerUsername(username))
+                .thenReturn(Optional.of(
+                        List.of(entity)));
+        doReturn(ExpenseInfoDTO.builder()
+                .id(entity.getId())
+                .name(entity.getName())
+                .totalPrice(entity.getTotalPrice())
+                .build())
+                .when(this.mockModelMapper).map(entity, ExpenseInfoDTO.class);
+
+        List<ExpenseInfoDTO> expenseInfoDTOS = toTest.addNewExpenseAndReturnAllIncomeOfUser(expenseDTO, username);
+        assertEquals(1, expenseInfoDTOS.size());
+        ExpenseInfoDTO actual = expenseInfoDTOS.get(0);
+        assertEquals(entity.getId(), actual.getId());
+        assertEquals(entity.getName(), actual.getName());
+        assertEquals(entity.getTotalPrice(), actual.getTotalPrice());
+    }
+
+    @Test
+    void addNewExpenseAndReturnAllIncomeOfUserMandatoryFields() {
+        String username = "username";
+        CreateExpenseMandatoryFieldsDTO expenseDTO = CreateExpenseMandatoryFieldsDTO.builder()
+                .name("name")
+                .category(ExpenseCategory.HEALTH.name())
+                .totalPrice(BigDecimal.ONE)
+                .timeOfPurchase(LocalDateTime.of(2022, 2,
+                        22, 22, 22, 22))
+                .build();
+
+        ExpenseEntity entity = ExpenseEntity.builder()
+                .name("name")
+                .category(new ExpenseCategoryEntity(ExpenseCategory.HEALTH))
+                .owner(new UserEntity())
+                .numberOfUnits(1)
+                .pricePerUnit(BigDecimal.ONE)
+                .totalPrice(BigDecimal.ONE)
+                .timeOfPurchase(LocalDateTime.of(2022, 2,
+                        22, 22, 22, 22))
+                .build();
+        UserForServicesDTO userForServicesDTO = UserForServicesDTO.builder()
+                .id(1L)
+                .username(username)
+                .build();
+        entity.setId(1L);
+
+        doReturn(userForServicesDTO)
+                .when(this.mockUserService).findUser(username);
+        doReturn(entity)
+                .when(this.mockModelMapper).map(expenseDTO, ExpenseEntity.class);
+        doReturn(new UserEntity())
+                .when(this.mockModelMapper).map(userForServicesDTO, UserEntity.class);
+        when(this.mockExpenseCategoryService.addCategory(ExpenseCategory.HEALTH.name()))
+                .thenReturn(new ExpenseCategoryEntity(ExpenseCategory.HEALTH));
+        when(this.mockExpenseRepository.findByOwnerUsername(username))
+                .thenReturn(Optional.of(
+                        List.of(entity)));
+        doReturn(ExpenseInfoDTO.builder()
+                .id(entity.getId())
+                .name(entity.getName())
+                .totalPrice(entity.getTotalPrice())
+                .build())
+                .when(this.mockModelMapper).map(entity, ExpenseInfoDTO.class);
+
+        List<ExpenseInfoDTO> expenseInfoDTOS = toTest.addNewExpenseAndReturnAllIncomeOfUser(expenseDTO, username);
+        assertEquals(1, expenseInfoDTOS.size());
+        ExpenseInfoDTO actual = expenseInfoDTOS.get(0);
+        assertEquals(entity.getId(), actual.getId());
+        assertEquals(entity.getName(), actual.getName());
+        assertEquals(entity.getTotalPrice(), actual.getTotalPrice());
+    }
+
 }

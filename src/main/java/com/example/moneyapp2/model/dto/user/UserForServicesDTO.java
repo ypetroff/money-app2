@@ -14,7 +14,7 @@ import java.util.List;
 @Builder
 public class UserForServicesDTO {
 
-    private String id;
+    private Long id;
 
     private String password;
 
