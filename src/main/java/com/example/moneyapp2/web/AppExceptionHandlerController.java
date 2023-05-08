@@ -79,6 +79,13 @@ public class AppExceptionHandlerController {
         return errorMap;
     }
 
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(NoSuchCategoryException.class)
+    public Map<String, String> handleNonExistentCategory(NoSuchCategoryException ex) {
 
+        Map<String, String> errorMap = new HashMap<>();
+        errorMap.put("Error message", ex.getMessage());
 
+        return errorMap;
+    }
 }
