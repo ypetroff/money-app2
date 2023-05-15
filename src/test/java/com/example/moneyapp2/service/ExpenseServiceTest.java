@@ -549,7 +549,6 @@ class ExpenseServiceTest {
                 .timeOfPurchase(LocalDateTime.of(2022, 2,
                         22, 22, 22, 22))
                 .build();
-
         ExpenseEntity entity = ExpenseEntity.builder()
                 .name("name")
                 .category(new ExpenseCategoryEntity(ExpenseCategory.HEALTH))
@@ -560,18 +559,21 @@ class ExpenseServiceTest {
                 .timeOfPurchase(LocalDateTime.of(2022, 2,
                         22, 22, 22, 22))
                 .build();
+        entity.setId(1L);
         UserForServicesDTO userForServicesDTO = UserForServicesDTO.builder()
                 .id(1L)
                 .username(username)
                 .build();
-        entity.setId(1L);
+
 
         doReturn(userForServicesDTO)
                 .when(this.mockUserService).findUser(username);
         doReturn(entity)
-                .when(this.mockModelMapper).map(expenseDTO, ExpenseEntity.class);
+                .when(this.mockModelMapper)
+                .map(expenseDTO, ExpenseEntity.class);
         doReturn(new UserEntity())
-                .when(this.mockModelMapper).map(userForServicesDTO, UserEntity.class);
+                .when(this.mockModelMapper)
+                .map(userForServicesDTO, UserEntity.class);
         when(this.mockExpenseCategoryService.addCategory(ExpenseCategory.HEALTH.name()))
                 .thenReturn(new ExpenseCategoryEntity(ExpenseCategory.HEALTH));
         when(this.mockExpenseRepository.findByOwnerUsername(username))
@@ -582,7 +584,8 @@ class ExpenseServiceTest {
                 .name(entity.getName())
                 .totalPrice(entity.getTotalPrice())
                 .build())
-                .when(this.mockModelMapper).map(entity, ExpenseInfoDTO.class);
+                .when(this.mockModelMapper)
+                .map(entity, ExpenseInfoDTO.class);
 
         List<ExpenseInfoDTO> expenseInfoDTOS = toTest.addNewExpenseAndReturnAllIncomeOfUser(expenseDTO, username);
         assertEquals(1, expenseInfoDTOS.size());
