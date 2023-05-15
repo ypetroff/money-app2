@@ -33,7 +33,7 @@ public class IncomeService {
 
     public BigDecimal getIncomeOfUser(String username) {
 
-        if(this.userService.findUserEntity(username).getId() == null) {
+        if(this.userService.findUserEntity(username) == null) {
             throw new NoAvailableDataException("User is not present in the database");
         }
 
