@@ -50,7 +50,7 @@ class ExpenseServiceTest {
     }
 
     @Test
-    void getTotalExpenseOnTeAppWithUsers() {
+    void getTotalExpenseOnTeAppWithUser() {
 
         Optional<BigDecimal> expectedSum = Optional.of(BigDecimal.TEN);
 
