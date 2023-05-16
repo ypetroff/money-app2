@@ -7,7 +7,6 @@ import com.example.moneyapp2.model.entity.ExpenseCategoryEntity;
 import com.example.moneyapp2.model.entity.ExpenseEntity;
 import com.example.moneyapp2.model.entity.user.UserEntity;
 import com.example.moneyapp2.model.enums.ExpenseCategory;
-import com.example.moneyapp2.repository.ExpenseCategoryRepository;
 import com.example.moneyapp2.repository.ExpenseRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -116,7 +115,6 @@ class ExpenseServiceTest {
 
     @Test
     void createEntityAndSaveItWithAllFields() {
-
         CreateExpenseDTO expenseDTO = CreateExpenseDTO.builder()
                 .name("name")
                 .category("CAR")
@@ -126,7 +124,6 @@ class ExpenseServiceTest {
                 .build();
 
         String username = "test";
-
 
         when(this.mockModelMapper.map(expenseDTO, ExpenseEntity.class))
                 .thenReturn(ExpenseEntity.builder()

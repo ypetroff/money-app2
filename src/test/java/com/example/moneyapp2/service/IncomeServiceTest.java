@@ -22,8 +22,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class IncomeServiceTest {
@@ -171,6 +170,30 @@ class IncomeServiceTest {
 
     @Test
     void createEntityAndSaveIt() {
+        String username = "test";
+        CreateIncomeDTO incomeDTO = CreateIncomeDTO.builder()
+                .incomeCategory(IncomeCategory.BANK.name())
+                .amount(BigDecimal.TEN)
+                .createdOn(LocalDateTime.of(2022, 2,
+                        22, 22, 22, 22))
+                .build();
+        IncomeEntity income = IncomeEntity.builder()
+                .incomeCategory(new IncomeCategoryEntity(IncomeCategory.BANK))
+                .amount(BigDecimal.TEN)
+                .owner(new UserEntity())
+                .createdOn(LocalDateTime.of(2022, 2,
+                        22, 22, 22, 22))
+                .build();
+        income.setId(1L);
+
+        when(this.mockModelMapper .map(incomeDTO, IncomeEntity.class))
+                .thenReturn(income);
+        when(this.mockUserService.findUser(username))
+                .thenReturn(new UserForServicesDTO());
+
+        toTest.createEntityAndSaveIt(incomeDTO, username);
+
+        verify(this.mockIncomeRepository).saveAndFlush(income);
     }
 
     @Test

@@ -27,7 +27,6 @@ public class ExpenseService {
     private final ModelMapper modelMapper;
 
     public BigDecimal getTotalExpenseOnTeApp() {
-
         return this.expenseRepository.allUsersExpenseSum().orElse(BigDecimal.ZERO);
     }
 
@@ -40,7 +39,6 @@ public class ExpenseService {
     }
 
     public void createEntityAndSaveIt(CreateExpenseDTO addExpenseDTO, String username) {
-
         verifyUser(username);
 
         ExpenseEntity entity = this.modelMapper.map(addExpenseDTO, ExpenseEntity.class);
@@ -57,7 +55,6 @@ public class ExpenseService {
     }
 
     public void createEntityAndSaveIt(CreateExpenseMandatoryFieldsDTO addExpenseDTO, String username) {
-
         verifyUser(username);
 
         ExpenseEntity entity = this.modelMapper.map(addExpenseDTO, ExpenseEntity.class);
@@ -68,7 +65,6 @@ public class ExpenseService {
     }
 
     private void setOwnerAndCategory(ExpenseEntity entity, String username, String category) {
-
         entity.setOwner(this.modelMapper.map(this.userService.findUser(username), UserEntity.class));
         entity.setCategory(this.expenseCategoryService.addCategory(category));
     }
@@ -84,28 +80,24 @@ public class ExpenseService {
 
 
     public Object getDetailsOfExpense(Long id) {
-
         ExpenseEntity entity = this.expenseRepository.findById(id)
                 .orElseThrow(() -> new NoAvailableDataException(
                         String.format("Expense with id: %d not found", id)));
 
         if (entity.getPricePerUnit() == null || entity.getNumberOfUnits() == null) {
-
             return this.modelMapper.map(entity, ExpenseMandatoryFieldsDetailsDTO.class);
         }
 
         return this.modelMapper.map(entity, ExpenseDetailsDTO.class);
     }
 
-    public List<ExpenseInfoDTO> addNewExpenseAndReturnAllIncomeOfUser(CreateExpenseDTO expenseDTO,
-                                                                      String username) {
+    public List<ExpenseInfoDTO> addNewExpenseAndReturnAllIncomeOfUser(CreateExpenseDTO expenseDTO, String username) {
         verifyUser(username);
         createEntityAndSaveIt(expenseDTO, username);
         return listOfExpenseInfoDTO(username);
     }
 
-    public List<ExpenseInfoDTO> addNewExpenseAndReturnAllIncomeOfUser(CreateExpenseMandatoryFieldsDTO expenseDTO,
-                                                                      String username) {
+    public List<ExpenseInfoDTO> addNewExpenseAndReturnAllIncomeOfUser(CreateExpenseMandatoryFieldsDTO expenseDTO, String username) {
         verifyUser(username);
         createEntityAndSaveIt(expenseDTO, username);
         return listOfExpenseInfoDTO(username);
@@ -121,7 +113,6 @@ public class ExpenseService {
     }
 
     public ExpenseDetailsDTO editExpense(Long id, CreateExpenseDTO changedExpenseInfo) {
-
         ExpenseEntity entity = this.expenseRepository.findById(id)
                 .orElseThrow(() -> new NoAvailableDataException(String.format("Expense with id: %d not found", id)));
 
@@ -137,12 +128,10 @@ public class ExpenseService {
     }
 
     public void deleteExpense(Long id) {
-
         this.expenseRepository.deleteById(id);
     }
 
     public EditExpenseDTO getSingleExpense(Long id) {
-
         return this.modelMapper.map(this.expenseRepository.findById(id)
                         .orElseThrow(() -> new NoAvailableDataException("Non existent expense")),
                 EditExpenseDTO.class);

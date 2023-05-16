@@ -14,7 +14,6 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 public class CreateExpenseDTO {
-
     @Size(min = 2, max = 200, message = "Name should be between 2 and 200 characters")
     @NotEmpty(message = "Name cannot be empty string")
     private String name;

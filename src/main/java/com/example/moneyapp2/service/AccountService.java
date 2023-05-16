@@ -9,11 +9,8 @@ import java.math.BigDecimal;
 @Service
 @RequiredArgsConstructor
 public class AccountService {
-
     private final IncomeService incomeService;
-
     private final ExpenseService expenseService;
-
     public AccountDashboardDTO getUserAccountInfo(String username) {
 
         BigDecimal income = this.incomeService.getIncomeOfUser(username);
