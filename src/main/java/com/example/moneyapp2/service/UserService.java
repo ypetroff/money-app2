@@ -57,11 +57,11 @@ public class UserService {
         this.userRepository.saveAndFlush(user);
     }
 
-    public UserEntity findUserEntity (String username) {
-
-        return this.userRepository.findByUsername(username)
-                .orElseThrow(() -> new NoAvailableDataException("User not found, based on principal username"));
-    }
+//    public UserEntity findUserEntity (String username) {
+//
+//        return this.userRepository.findByUsername(username)
+//                .orElseThrow(() -> new NoAvailableDataException("User not found, based on principal username"));
+//    }
 
     public UserForServicesDTO findUser(String username) {
         UserEntity entity = this.userRepository.findByUsername(username)
@@ -79,7 +79,6 @@ public class UserService {
                 .map(u -> this.modelMapper.map(u, UserForAdminPanelDTO.class))
                 .toList();
     }
-
 
     public boolean isNotPresent(Long id) {
 
@@ -112,4 +111,6 @@ public class UserService {
             this.userRepository.saveAndFlush(entity);
         }
     }
+
+
 }
