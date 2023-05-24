@@ -390,7 +390,7 @@ class ExpenseServiceTest {
   }
 
   @Test
-  void editExpense() {
+  void editExpenseInvalidId() {
     Long id = 1L;
     String errorMessage = String.format("Expense with id: %d not found", id);
 

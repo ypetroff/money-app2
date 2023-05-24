@@ -261,7 +261,7 @@ class IncomeServiceTest {
   }
 
   @Test
-  void editIncome() {
+  void editIncomeValidId() {
     Long id = 1L;
     IncomeEntity income =
         IncomeEntity.builder()
@@ -321,7 +321,25 @@ class IncomeServiceTest {
   }
 
   @Test
-  void incomeNotPresent() {}
+  void editIncomeInvalidId() {
+    Long id = 1L;
+    assertThrows(NoAvailableDataException.class,
+            () -> toTest.editIncome(id, new CreateIncomeDTO()));
+  }
+
+  @Test
+  void incomeNotPresentReturnsFalse() {
+    long id = 1L;
+    when(this.mockIncomeRepository.existsById(id))
+            .thenReturn(true);
+    assertFalse(toTest.IncomeNotPresent(id));
+  }
+
+  @Test
+  void incomeNotPresentReturnsTrue() {
+    long id = 1L;
+    assertTrue(toTest.IncomeNotPresent(id));
+  }
 
   @Test
   void deleteIncome() {}
