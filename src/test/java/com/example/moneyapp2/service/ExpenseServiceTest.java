@@ -3,6 +3,7 @@ package com.example.moneyapp2.service;
 import com.example.moneyapp2.exception.NoAvailableDataException;
 import com.example.moneyapp2.model.dto.expense.*;
 import com.example.moneyapp2.model.dto.user.UserForServicesDTO;
+import com.example.moneyapp2.model.entity.BaseEntity;
 import com.example.moneyapp2.model.entity.ExpenseCategoryEntity;
 import com.example.moneyapp2.model.entity.ExpenseEntity;
 import com.example.moneyapp2.model.entity.user.UserEntity;
@@ -446,17 +447,17 @@ class ExpenseServiceTest {
     when(this.mockExpenseRepository.findById(id)).thenReturn(Optional.of(entity));
     when(this.mockModelMapper.map(entity, EditExpenseDTO.class)).thenReturn(dto);
 
-    toTest.getSingleExpense(id);
+    EditExpenseDTO actual = toTest.getSingleExpense(id);
 
     verify(this.mockExpenseRepository).findById(id);
 
-    assertEquals(entity.getId(), dto.getId());
-    assertEquals(entity.getName(), dto.getName());
-    assertEquals(entity.getCategory().toString(), dto.getCategory());
-    assertEquals(entity.getNumberOfUnits(), dto.getNumberOfUnits());
-    assertEquals(entity.getPricePerUnit(), dto.getPricePerUnit());
-    assertEquals(entity.getTotalPrice(), dto.getTotalPrice());
-    assertEquals(entity.getTimeOfPurchase().toString(), dto.getTimeOfPurchase());
+    assertEquals(entity.getId(), actual.getId());
+    assertEquals(entity.getName(), actual.getName());
+    assertEquals(entity.getCategory().toString(), actual.getCategory());
+    assertEquals(entity.getNumberOfUnits(), actual.getNumberOfUnits());
+    assertEquals(entity.getPricePerUnit(), actual.getPricePerUnit());
+    assertEquals(entity.getTotalPrice(), actual.getTotalPrice());
+    assertEquals(entity.getTimeOfPurchase().toString(), actual.getTimeOfPurchase());
   }
 
   @Test
