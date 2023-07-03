@@ -12,6 +12,7 @@ import com.example.moneyapp2.model.enums.IncomeCategory;
 import com.example.moneyapp2.repository.SavingsRepository;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -35,12 +36,11 @@ public class SavingService {
     private final ModelMapper modelMapper;
 
     public List<SavingInfoDTO> getAllSavingOfUser(String username) {
-
+        verifyUser(username);
         return listOfSavingInfoDTO(username);
     }
 
     private List<SavingInfoDTO> listOfSavingInfoDTO(String username) {
-
         UserEntity userEntity = this.modelMapper.map(this.userService.findUser(username), UserEntity.class);
 
         return this.savingsRepository.findAllByOwnersContaining(userEntity)
@@ -205,5 +205,14 @@ public class SavingService {
         this.savingsRepository.findAll().stream()
                 .filter(s -> s.getEndDate().equals(LocalDate.now()))
                 .forEach(s -> deleteSaving(s.getId()));
+    }
+
+    private void verifyUser(String username) {
+        if (this.userService.findUser(username) == null) {
+            throw new UsernameNotFoundException(
+                    String.format(
+                            "%s is not present in the database. The variable was extracted from the Principal",
+                            username));
+        }
     }
 }
