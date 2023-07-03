@@ -105,7 +105,6 @@ public class IncomeService {
   }
 
   public boolean IncomeNotPresent(Long id) {
-
     return !this.incomeRepository.existsById(id);
   }
 
