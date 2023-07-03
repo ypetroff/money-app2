@@ -1,13 +1,18 @@
 package com.example.moneyapp2.service;
 
 import com.example.moneyapp2.exception.NoAvailableDataException;
+import com.example.moneyapp2.model.dto.expense.EditExpenseDTO;
 import com.example.moneyapp2.model.dto.income.CreateIncomeDTO;
+import com.example.moneyapp2.model.dto.income.EditIncomeDTO;
 import com.example.moneyapp2.model.dto.income.IncomeDetailsDTO;
 import com.example.moneyapp2.model.dto.income.IncomeInfoDTO;
 import com.example.moneyapp2.model.dto.user.UserForServicesDTO;
+import com.example.moneyapp2.model.entity.ExpenseCategoryEntity;
+import com.example.moneyapp2.model.entity.ExpenseEntity;
 import com.example.moneyapp2.model.entity.IncomeCategoryEntity;
 import com.example.moneyapp2.model.entity.IncomeEntity;
 import com.example.moneyapp2.model.entity.user.UserEntity;
+import com.example.moneyapp2.model.enums.ExpenseCategory;
 import com.example.moneyapp2.model.enums.IncomeCategory;
 import com.example.moneyapp2.repository.IncomeRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -280,32 +285,30 @@ class IncomeServiceTest {
             .createdOn(LocalDateTime.of(2022, 2, 22, 22, 22, 22))
             .build();
     IncomeDetailsDTO detailsDTO =
-            IncomeDetailsDTO.builder()
-                    .id(income.getId())
-                    .incomeCategory(incomeDTO.getIncomeCategory())
-                    .amount(incomeDTO.getAmount())
-                    .description(incomeDTO.getDescription())
-                    .createdOn(incomeDTO.getCreatedOn().toString())
-                            .build();
+        IncomeDetailsDTO.builder()
+            .id(income.getId())
+            .incomeCategory(incomeDTO.getIncomeCategory())
+            .amount(incomeDTO.getAmount())
+            .description(incomeDTO.getDescription())
+            .createdOn(incomeDTO.getCreatedOn().toString())
+            .build();
 
-    when(this.mockIncomeRepository.findById(id))
-            .thenReturn(Optional.of(income));
+    when(this.mockIncomeRepository.findById(id)).thenReturn(Optional.of(income));
     doAnswer(
             invocation -> {
               IncomeEntity e = invocation.getArgument(1);
               e.setId(income.getId());
-              e.setIncomeCategory(new IncomeCategoryEntity(IncomeCategory.valueOf(incomeDTO.getIncomeCategory())));
+              e.setIncomeCategory(
+                  new IncomeCategoryEntity(IncomeCategory.valueOf(incomeDTO.getIncomeCategory())));
               e.setOwner(income.getOwner());
               e.setAmount(incomeDTO.getAmount());
               e.setDescription(incomeDTO.getDescription());
               e.setCreatedOn(incomeDTO.getCreatedOn());
               return null;
             })
-            .when(this.mockModelMapper)
-            .map(incomeDTO, income);
-    doReturn(detailsDTO)
-            .when(this.mockModelMapper)
-            .map(income, IncomeDetailsDTO.class);
+        .when(this.mockModelMapper)
+        .map(incomeDTO, income);
+    doReturn(detailsDTO).when(this.mockModelMapper).map(income, IncomeDetailsDTO.class);
 
     IncomeDetailsDTO actual = toTest.editIncome(id, incomeDTO);
 
@@ -323,15 +326,14 @@ class IncomeServiceTest {
   @Test
   void editIncomeInvalidId() {
     Long id = 1L;
-    assertThrows(NoAvailableDataException.class,
-            () -> toTest.editIncome(id, new CreateIncomeDTO()));
+    assertThrows(
+        NoAvailableDataException.class, () -> toTest.editIncome(id, new CreateIncomeDTO()));
   }
 
   @Test
   void incomeNotPresentReturnsFalse() {
     long id = 1L;
-    when(this.mockIncomeRepository.existsById(id))
-            .thenReturn(true);
+    when(this.mockIncomeRepository.existsById(id)).thenReturn(true);
     assertFalse(toTest.IncomeNotPresent(id));
   }
 
@@ -342,14 +344,104 @@ class IncomeServiceTest {
   }
 
   @Test
-  void deleteIncome() {}
+  void deleteIncome() {
+    toTest.deleteIncome(1L);
+    verify(this.mockIncomeRepository).deleteById(1L);
+  }
 
   @Test
-  void unauthorizedUser() {}
+  void unauthorizedUserReturnsFalse() {
+    String username = "username";
+    long id = 1L;
+
+    IncomeEntity entity =
+        IncomeEntity.builder().owner(UserEntity.builder().username(username).build()).build();
+
+    when(this.mockUserService.findUser(username)).thenReturn(new UserForServicesDTO());
+    when(this.mockIncomeRepository.findById(id)).thenReturn(Optional.of(entity));
+
+    assertFalse(toTest.unauthorizedUser(id, username));
+  }
 
   @Test
-  void getSingleIncome() {}
+  void unauthorizedUserReturnsTrue() {
+    String username = "username";
+    long id = 1L;
+
+    UserEntity user = UserEntity.builder().username("test").build();
+
+    IncomeEntity entity = IncomeEntity.builder().owner(user).build();
+
+    when(this.mockUserService.findUser(username)).thenReturn(new UserForServicesDTO());
+    when(this.mockIncomeRepository.findById(id)).thenReturn(Optional.of(entity));
+
+    assertTrue(toTest.unauthorizedUser(id, username));
+  }
 
   @Test
-  void maintenance() {}
+  void unauthorizedUserThrowsUsernameNotFound() {
+    String username = "username";
+    long id = 1L;
+    assertThrows(UsernameNotFoundException.class, () -> toTest.unauthorizedUser(id, username));
+  }
+
+  @Test
+  void unauthorizedUserThrowsNoAvlData() {
+    String username = "username";
+    long id = 1L;
+
+    when(this.mockUserService.findUser(username)).thenReturn(new UserForServicesDTO());
+
+    assertThrows(NoAvailableDataException.class, () -> toTest.unauthorizedUser(id, username));
+  }
+
+  @Test
+  void getSingleIncomeWithValidId() {
+    long id = 1L;
+    IncomeEntity entity =
+        IncomeEntity.builder()
+            .amount(BigDecimal.ONE)
+            .description("test-description")
+            .createdOn(LocalDateTime.of(2000, 2, 22, 22, 22, 22))
+            .incomeCategory(new IncomeCategoryEntity(IncomeCategory.BANK))
+            .owner(new UserEntity())
+            .build();
+
+    entity.setId(id);
+    EditIncomeDTO dto =
+        EditIncomeDTO.builder()
+            .id(entity.getId())
+            .amount(entity.getAmount())
+            .description(entity.getDescription())
+            .createdOn(entity.getCreatedOn())
+            .incomeCategory(entity.getIncomeCategory().getCategory().name())
+            .build();
+
+    when(this.mockIncomeRepository.findById(id)).thenReturn(Optional.of(entity));
+    when(this.mockModelMapper.map(entity, EditIncomeDTO.class)).thenReturn(dto);
+
+    EditIncomeDTO actual = toTest.getSingleIncome(id);
+
+    verify(this.mockIncomeRepository).findById(id);
+
+    assertEquals(entity.getAmount(), actual.getAmount());
+    assertEquals(entity.getDescription(), actual.getDescription());
+    assertEquals(entity.getCreatedOn(), actual.getCreatedOn());
+    assertEquals(entity.getIncomeCategory().getCategory().name(), actual.getIncomeCategory());
+  }
+
+  @Test
+  void maintenance() {
+    IncomeEntity entityToRemain =
+        IncomeEntity.builder().createdOn(LocalDateTime.of(2022, 2, 22, 22, 22, 22)).build();
+    IncomeEntity entityToBeDeleted =
+        IncomeEntity.builder().createdOn(LocalDateTime.of(2000, 2, 22, 22, 22, 22)).build();
+
+    when(this.mockIncomeRepository.findAll())
+        .thenReturn(List.of(entityToRemain, entityToBeDeleted));
+
+    toTest.maintenance();
+
+    verify(this.mockIncomeRepository).findAll();
+  }
 }
