@@ -1,20 +1,23 @@
 package com.example.moneyapp2.service;
 
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
+
 import com.example.moneyapp2.exception.NoAvailableDataException;
-import com.example.moneyapp2.model.dto.expense.EditExpenseDTO;
 import com.example.moneyapp2.model.dto.income.CreateIncomeDTO;
 import com.example.moneyapp2.model.dto.income.EditIncomeDTO;
 import com.example.moneyapp2.model.dto.income.IncomeDetailsDTO;
 import com.example.moneyapp2.model.dto.income.IncomeInfoDTO;
 import com.example.moneyapp2.model.dto.user.UserForServicesDTO;
-import com.example.moneyapp2.model.entity.ExpenseCategoryEntity;
-import com.example.moneyapp2.model.entity.ExpenseEntity;
 import com.example.moneyapp2.model.entity.IncomeCategoryEntity;
 import com.example.moneyapp2.model.entity.IncomeEntity;
 import com.example.moneyapp2.model.entity.user.UserEntity;
-import com.example.moneyapp2.model.enums.ExpenseCategory;
 import com.example.moneyapp2.model.enums.IncomeCategory;
 import com.example.moneyapp2.repository.IncomeRepository;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -22,14 +25,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class IncomeServiceTest {
@@ -428,6 +423,11 @@ class IncomeServiceTest {
     assertEquals(entity.getDescription(), actual.getDescription());
     assertEquals(entity.getCreatedOn(), actual.getCreatedOn());
     assertEquals(entity.getIncomeCategory().getCategory().name(), actual.getIncomeCategory());
+  }
+
+  @Test
+  void getSingleIncomeThrowsWithInvalidId() {
+    assertThrows(NoAvailableDataException.class, () -> toTest.getSingleIncome(1L));
   }
 
   @Test
