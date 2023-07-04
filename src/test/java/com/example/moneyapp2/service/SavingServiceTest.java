@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
 import com.example.moneyapp2.exception.NoAvailableDataException;
+import com.example.moneyapp2.model.dto.saving.CreateSavingDTO;
 import com.example.moneyapp2.model.dto.saving.SavingInfoDTO;
 import com.example.moneyapp2.model.dto.user.UserForServicesDTO;
 import com.example.moneyapp2.model.entity.SavingEntity;
@@ -103,7 +104,57 @@ class SavingServiceTest {
 
   @Test
   void addNewSavingAndReturnAllSavingsOfUser() {
+    String username = "test-username";
+    UserEntity userEntity = new UserEntity();
 
+    CreateSavingDTO saving =
+        CreateSavingDTO.builder()
+            .amount(BigDecimal.ONE)
+            .goal("test-goal")
+            .owners(List.of(username))
+            .contributors(List.of(username))
+            .dateOfCreation(LocalDateTime.of(2000, 3, 3, 10, 0, 0))
+            .endDate(LocalDate.of(2000, 3, 22))
+            .build();
+
+    SavingEntity savingEntity =
+        SavingEntity.builder()
+            .contributors(List.of(new UserEntity()))
+            .owners(List.of(new UserEntity()))
+            .amount(BigDecimal.ONE)
+            .goal("test-goal")
+            .dateOfCreation(LocalDateTime.of(1999, 3, 23, 12, 0, 0))
+            .endDate(LocalDate.of(2000, 3, 22))
+            .build();
+    savingEntity.setId(1L);
+
+    when(this.mockUserServive.findUser(username)).thenReturn(new UserForServicesDTO());
+    when((this.mockModelMapper.map(new UserForServicesDTO(), UserEntity.class)))
+        .thenReturn(UserEntity.builder().username(username).build());
+    when(this.mockModelMapper.map(new UserForServicesDTO(), UserEntity.class))
+        .thenReturn(userEntity);
+    when(this.mockSavingsRepository.findAllByOwnersContaining(userEntity))
+        .thenReturn(Optional.of(List.of(savingEntity)));
+    when(this.mockModelMapper.map(savingEntity, SavingInfoDTO.class))
+        .thenReturn(
+            SavingInfoDTO.builder()
+                .id(savingEntity.getId())
+                .amount(savingEntity.getAmount())
+                .goal(savingEntity.getGoal())
+                .endDate(savingEntity.getEndDate())
+                .build());
+
+    List<SavingInfoDTO> actualSavings =
+        toTest.addNewSavingAndReturnAllSavingsOfUser(saving, username);
+
+    assertEquals(1, actualSavings.size());
+
+    SavingInfoDTO actual = actualSavings.get(0);
+
+    assertEquals(savingEntity.getId(), actual.getId());
+    assertEquals(savingEntity.getAmount(), actual.getAmount());
+    assertEquals(savingEntity.getEndDate(), actual.getEndDate());
+    assertEquals(savingEntity.getGoal(), actual.getGoal());
   }
 
   @Test
