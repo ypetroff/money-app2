@@ -5,6 +5,7 @@ import static org.mockito.Mockito.when;
 
 import com.example.moneyapp2.exception.NoAvailableDataException;
 import com.example.moneyapp2.model.dto.saving.CreateSavingDTO;
+import com.example.moneyapp2.model.dto.saving.SavingDetailsDTO;
 import com.example.moneyapp2.model.dto.saving.SavingInfoDTO;
 import com.example.moneyapp2.model.dto.user.UserForServicesDTO;
 import com.example.moneyapp2.model.entity.SavingEntity;
@@ -158,13 +159,62 @@ class SavingServiceTest {
   }
 
   @Test
-  void createEntityAndSaveIt() {}
+  void savingNotPresentReturnsTrue() {
+    assertTrue(toTest.SavingNotPresent(1L));
+  }
 
   @Test
-  void savingNotPresent() {}
+  void savingNotPresentReturnsFalse() {
+    when(this.mockSavingsRepository.existsById(1L)).thenReturn(true);
+    assertFalse(toTest.SavingNotPresent(1L));
+  }
 
   @Test
-  void getDetailsOfSaving() {}
+  void getDetailsOfSavingThrows() {
+    long id = 1;
+
+    NoAvailableDataException exception =
+        assertThrows(NoAvailableDataException.class, () -> toTest.getDetailsOfSaving(id));
+
+    assertEquals(String.format("Saving with id: %d not found", id), exception.getMessage());
+  }
+
+  @Test
+  void getDetailsOfSaving() {
+    long id = 1;
+    SavingEntity savingEntity =
+        SavingEntity.builder()
+            .contributors(List.of(new UserEntity()))
+            .owners(List.of(new UserEntity()))
+            .amount(BigDecimal.ONE)
+            .goal("test-goal")
+            .dateOfCreation(LocalDateTime.of(1999, 3, 23, 12, 0, 0))
+            .endDate(LocalDate.of(2000, 3, 22))
+            .build();
+    savingEntity.setId(id);
+
+    when(this.mockSavingsRepository.findById(id)).thenReturn(Optional.of(savingEntity));
+    when(this.mockModelMapper.map(savingEntity, SavingDetailsDTO.class))
+        .thenReturn(
+            SavingDetailsDTO.builder()
+                .id(savingEntity.getId())
+                .amount(savingEntity.getAmount())
+                .goal(savingEntity.getGoal())
+                .owners(savingEntity.getOwners().stream().map(UserEntity::getUsername).toList())
+                .contributors(
+                    savingEntity.getContributors().stream().map(UserEntity::getUsername).toList())
+                .dateOfCreation(savingEntity.getDateOfCreation())
+                .endDate(savingEntity.getEndDate())
+                .build());
+
+    SavingDetailsDTO actual = toTest.getDetailsOfSaving(id);
+
+    assertEquals(savingEntity.getId(), actual.getId());
+    assertEquals(savingEntity.getGoal(), actual.getGoal());
+    assertEquals(savingEntity.getAmount(), actual.getAmount());
+    assertEquals(savingEntity.getDateOfCreation(), actual.getDateOfCreation());
+    assertEquals(savingEntity.getEndDate(), actual.getEndDate());
+  }
 
   @Test
   void editSaving() {}
