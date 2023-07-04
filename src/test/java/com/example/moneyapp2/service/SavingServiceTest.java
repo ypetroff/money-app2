@@ -3,6 +3,7 @@ package com.example.moneyapp2.service;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
+import com.example.moneyapp2.exception.NoAvailableDataException;
 import com.example.moneyapp2.model.dto.saving.SavingInfoDTO;
 import com.example.moneyapp2.model.dto.user.UserForServicesDTO;
 import com.example.moneyapp2.model.entity.SavingEntity;
@@ -63,12 +64,14 @@ class SavingServiceTest {
     when(this.mockModelMapper.map(userDTO, UserEntity.class)).thenReturn(userEntity);
     when(this.mockSavingsRepository.findAllByOwnersContaining(userEntity))
         .thenReturn(Optional.of(List.of(savingEntity)));
-    when(this.mockModelMapper.map(savingEntity, SavingInfoDTO.class)).thenReturn(SavingInfoDTO.builder()
-                                                                             .id(savingEntity.getId())
-                                                                             .amount(savingEntity.getAmount())
-                                                                             .goal(savingEntity.getGoal())
-                                                                             .endDate(savingEntity.getEndDate())
-                                                                                      .build());
+    when(this.mockModelMapper.map(savingEntity, SavingInfoDTO.class))
+        .thenReturn(
+            SavingInfoDTO.builder()
+                .id(savingEntity.getId())
+                .amount(savingEntity.getAmount())
+                .goal(savingEntity.getGoal())
+                .endDate(savingEntity.getEndDate())
+                .build());
 
     List<SavingInfoDTO> actualList = toTest.getAllSavingOfUser(username);
 
@@ -82,7 +85,26 @@ class SavingServiceTest {
   }
 
   @Test
-  void addNewSavingAndReturnAllSavingsOfUser() {}
+  void getAllSavingOfUserWithoutSavings() {
+    String username = "test-username";
+    UserEntity userEntity = new UserEntity();
+    UserForServicesDTO userDTO = new UserForServicesDTO();
+
+    when(this.mockUserServive.findUser(username)).thenReturn(userDTO);
+    when(this.mockModelMapper.map(userDTO, UserEntity.class)).thenReturn(userEntity);
+
+    NoAvailableDataException exception =
+        assertThrows(NoAvailableDataException.class, () -> toTest.getAllSavingOfUser(username));
+
+    assertEquals(
+        String.format("User with username %s does not have any savings", username),
+        exception.getMessage());
+  }
+
+  @Test
+  void addNewSavingAndReturnAllSavingsOfUser() {
+
+  }
 
   @Test
   void createEntityAndSaveIt() {}
