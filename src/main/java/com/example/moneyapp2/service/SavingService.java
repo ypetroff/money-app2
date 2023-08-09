@@ -10,11 +10,6 @@ import com.example.moneyapp2.model.entity.SavingEntity;
 import com.example.moneyapp2.model.entity.user.UserEntity;
 import com.example.moneyapp2.model.enums.IncomeCategory;
 import com.example.moneyapp2.repository.SavingsRepository;
-import lombok.RequiredArgsConstructor;
-import org.modelmapper.ModelMapper;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.stereotype.Service;
-
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.time.LocalDate;
@@ -22,6 +17,10 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
@@ -34,7 +33,7 @@ public class SavingService {
   private final IncomeService incomeService;
 
   private final ModelMapper modelMapper;
-
+  
   public List<SavingInfoDTO> getAllSavingOfUser(String username) {
     verifyUser(username);
     return listOfSavingInfoDTO(username);
@@ -165,7 +164,7 @@ public class SavingService {
             .findById(id)
             .orElseThrow(() -> new NoAvailableDataException("User not found!"));
 
-    return isOwner(username, entity) && !isContributor(username, entity);
+    return !isOwner(username, entity) && !isContributor(username, entity);
   }
 
   private boolean isContributor(String username, SavingEntity entity) {
@@ -179,7 +178,7 @@ public class SavingService {
     Optional<UserEntity> owner =
         entity.getOwners().stream().filter(o -> o.getUsername().equals(username)).findFirst();
 
-    return owner.isEmpty();
+    return owner.isPresent();
   }
 
   public boolean unauthorizedToModify(Long id, String username) {
@@ -188,7 +187,7 @@ public class SavingService {
             .findById(id)
             .orElseThrow(() -> new NoAvailableDataException("User not found!"));
 
-    return isOwner(username, entity);
+    return !isOwner(username, entity);
   }
 
   public EditSavingDTO getSingleSaving(Long id) {
@@ -216,7 +215,7 @@ public class SavingService {
         .filter(s -> s.getEndDate().equals(LocalDate.now()))
         .forEach(s -> deleteSaving(s.getId()));
   }
-
+  
   private void verifyUser(String username) {
     if (this.userService.findUser(username) == null) {
       throw new UsernameNotFoundException(

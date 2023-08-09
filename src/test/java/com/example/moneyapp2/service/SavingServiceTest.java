@@ -1,10 +1,11 @@
 package com.example.moneyapp2.service;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import com.example.moneyapp2.exception.NoAvailableDataException;
 import com.example.moneyapp2.model.dto.saving.CreateSavingDTO;
+import com.example.moneyapp2.model.dto.saving.EditSavingDTO;
 import com.example.moneyapp2.model.dto.saving.SavingDetailsDTO;
 import com.example.moneyapp2.model.dto.saving.SavingInfoDTO;
 import com.example.moneyapp2.model.dto.user.UserForServicesDTO;
@@ -22,13 +23,14 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 @ExtendWith(MockitoExtension.class)
 class SavingServiceTest {
 
   @Mock private SavingsRepository mockSavingsRepository;
 
-  @Mock private UserService mockUserServive;
+  @Mock private UserService mockUserService;
 
   @Mock private IncomeService mockIncomeService;
 
@@ -41,7 +43,7 @@ class SavingServiceTest {
     toTest =
         new SavingService(
             this.mockSavingsRepository,
-            this.mockUserServive,
+            this.mockUserService,
             this.mockIncomeService,
             this.mockModelMapper);
   }
@@ -62,7 +64,7 @@ class SavingServiceTest {
             .build();
     savingEntity.setId(1L);
 
-    when(this.mockUserServive.findUser(username)).thenReturn(userDTO);
+    when(this.mockUserService.findUser(username)).thenReturn(userDTO);
     when(this.mockModelMapper.map(userDTO, UserEntity.class)).thenReturn(userEntity);
     when(this.mockSavingsRepository.findAllByOwnersContaining(userEntity))
         .thenReturn(Optional.of(List.of(savingEntity)));
@@ -92,7 +94,7 @@ class SavingServiceTest {
     UserEntity userEntity = new UserEntity();
     UserForServicesDTO userDTO = new UserForServicesDTO();
 
-    when(this.mockUserServive.findUser(username)).thenReturn(userDTO);
+    when(this.mockUserService.findUser(username)).thenReturn(userDTO);
     when(this.mockModelMapper.map(userDTO, UserEntity.class)).thenReturn(userEntity);
 
     NoAvailableDataException exception =
@@ -102,6 +104,24 @@ class SavingServiceTest {
         String.format("User with username %s does not have any savings", username),
         exception.getMessage());
   }
+  @Test
+  void getAllSavingOfUnexistingUser() {
+    String username = "test-username";
+
+    when(this.mockUserService.findUser(username)).thenReturn(null);
+
+    UsernameNotFoundException exception =
+            assertThrows(UsernameNotFoundException.class, () -> toTest.getAllSavingOfUser(username));
+
+    assertEquals(
+            String.format(
+                    "%s is not present in the database. The variable was extracted from the Principal",
+                    username),
+            exception.getMessage());
+  }
+
+
+
 
   @Test
   void addNewSavingAndReturnAllSavingsOfUser() {
@@ -129,7 +149,7 @@ class SavingServiceTest {
             .build();
     savingEntity.setId(1L);
 
-    when(this.mockUserServive.findUser(username)).thenReturn(new UserForServicesDTO());
+    when(this.mockUserService.findUser(username)).thenReturn(new UserForServicesDTO());
     when((this.mockModelMapper.map(new UserForServicesDTO(), UserEntity.class)))
         .thenReturn(UserEntity.builder().username(username).build());
     when(this.mockModelMapper.map(new UserForServicesDTO(), UserEntity.class))
@@ -217,20 +237,296 @@ class SavingServiceTest {
   }
 
   @Test
-  void editSaving() {}
+  void editSaving() {
+    long id = 1;
+    CreateSavingDTO savingDTO =
+        CreateSavingDTO.builder()
+            .goal("test-goal")
+            .amount(BigDecimal.ONE)
+            .dateOfCreation(LocalDateTime.of(1999, 3, 23, 12, 0, 0))
+            .endDate(LocalDate.of(2000, 3, 22))
+            .build();
+
+    SavingEntity entity =
+        SavingEntity.builder()
+            .dateOfCreation(savingDTO.getDateOfCreation())
+            .endDate(savingDTO.getEndDate())
+            .goal(savingDTO.getGoal())
+            .amount(BigDecimal.TEN)
+            .build();
+    entity.setId(id);
+
+    when(this.mockSavingsRepository.findById(id)).thenReturn(Optional.of(entity));
+    doAnswer(
+            invocation -> {
+              SavingEntity e = invocation.getArgument(1);
+              e.setId(entity.getId());
+              e.setDateOfCreation(savingDTO.getDateOfCreation());
+              e.setEndDate(savingDTO.getEndDate());
+              e.setAmount(savingDTO.getAmount());
+
+              return null;
+            })
+        .when(this.mockModelMapper)
+        .map(savingDTO, entity);
+    doReturn(
+            SavingDetailsDTO.builder()
+                .id(entity.getId())
+                .endDate(savingDTO.getEndDate())
+                .dateOfCreation(savingDTO.getDateOfCreation())
+                .goal(savingDTO.getGoal())
+                .amount(savingDTO.getAmount())
+                .build())
+        .when(this.mockModelMapper)
+        .map(entity, SavingDetailsDTO.class);
+
+    SavingDetailsDTO actual = toTest.editSaving(id, savingDTO);
+
+    verify(this.mockSavingsRepository).saveAndFlush(entity);
+
+    assertEquals(id, actual.getId());
+    assertEquals(savingDTO.getAmount(), actual.getAmount());
+    assertEquals(savingDTO.getDateOfCreation(), actual.getDateOfCreation());
+    assertEquals(savingDTO.getEndDate(), actual.getEndDate());
+  }
 
   @Test
-  void deleteSaving() {}
+  void editSavingThrows() {
+    long id = 1;
+
+    NoAvailableDataException exception =
+        assertThrows(
+            NoAvailableDataException.class, () -> toTest.editSaving(id, new CreateSavingDTO()));
+
+    assertEquals(String.format("Saving with id: %d not found", id), exception.getMessage());
+  }
 
   @Test
-  void unauthorizedView() {}
+  void deleteSavingWithGoalName() {
+    long id = 1;
+
+    SavingEntity entity =
+        SavingEntity.builder()
+            .goal("test-goal")
+            .amount(BigDecimal.ONE)
+            .dateOfCreation(LocalDateTime.of(1999, 3, 23, 12, 0, 0))
+            .endDate(LocalDate.of(2000, 3, 22))
+            .owners(List.of(new UserEntity(), new UserEntity()))
+            .build();
+    entity.setId(id);
+
+    when(this.mockSavingsRepository.findById(id)).thenReturn(Optional.of(entity));
+
+    toTest.deleteSaving(id);
+
+    verify(mockSavingsRepository).findById(id);
+    verify(mockIncomeService, times(2)).createEntityAndSaveIt(any(), any());
+    verify(mockSavingsRepository).deleteById(id);
+  }
 
   @Test
-  void unauthorizedToModify() {}
+  void deleteSavingWithoutGoalNameProvidedByUser() {
+    long id = 1;
+
+    SavingEntity entity =
+        SavingEntity.builder()
+            .goal("not provided by user")
+            .amount(BigDecimal.ONE)
+            .dateOfCreation(LocalDateTime.of(1999, 3, 23, 12, 0, 0))
+            .endDate(LocalDate.of(2000, 3, 22))
+            .owners(List.of(new UserEntity(), new UserEntity()))
+            .build();
+    entity.setId(id);
+
+    when(this.mockSavingsRepository.findById(id)).thenReturn(Optional.of(entity));
+
+    toTest.deleteSaving(id);
+
+    verify(mockSavingsRepository).findById(id);
+    verify(mockIncomeService, times(2)).createEntityAndSaveIt(any(), any());
+    verify(mockSavingsRepository).deleteById(id);
+  }
 
   @Test
-  void getSingleSaving() {}
+  void unauthorizedViewUserIsOwner() {
+    long id = 1;
+    String username = "owner";
+
+    UserEntity owner = new UserEntity();
+    owner.setUsername("owner");
+
+    UserEntity contributor = new UserEntity();
+    contributor.setUsername("contributor");
+
+    SavingEntity entity =
+        SavingEntity.builder().owners(List.of(owner)).contributors(List.of(contributor)).build();
+    entity.setId(id);
+
+    when(this.mockSavingsRepository.findById(id)).thenReturn(Optional.of(entity));
+
+    assertFalse(toTest.unauthorizedView(id, username));
+  }
 
   @Test
-  void maintenance() {}
+  void unauthorizedViewUserIsContributor() {
+    long id = 1;
+    String username = "contributor";
+
+    UserEntity owner = new UserEntity();
+    owner.setUsername("owner");
+
+    UserEntity contributor = new UserEntity();
+    contributor.setUsername("contributor");
+
+    SavingEntity entity =
+        SavingEntity.builder().owners(List.of(owner)).contributors(List.of(contributor)).build();
+    entity.setId(id);
+
+    when(this.mockSavingsRepository.findById(id)).thenReturn(Optional.of(entity));
+
+    assertFalse(toTest.unauthorizedView(id, username));
+  }
+
+  @Test
+  void unauthorizedViewUserIsNotOwnerAndNotContributor() {
+    long id = 1;
+    String username = "another-user";
+
+    UserEntity owner = new UserEntity();
+    owner.setUsername("owner");
+
+    UserEntity contributor = new UserEntity();
+    contributor.setUsername("contributor");
+
+    SavingEntity entity =
+        SavingEntity.builder().owners(List.of(owner)).contributors(List.of(contributor)).build();
+    entity.setId(id);
+
+    when(this.mockSavingsRepository.findById(id)).thenReturn(Optional.of(entity));
+
+    assertTrue(toTest.unauthorizedView(id, username));
+  }
+
+  @Test
+  void unauthorizedToModifyWhenUserIsOwner() {
+    long id = 1;
+    String username = "owner";
+
+    UserEntity owner = new UserEntity();
+    owner.setUsername("owner");
+
+    SavingEntity entity = SavingEntity.builder().owners(List.of(owner)).build();
+    entity.setId(id);
+
+    when(this.mockSavingsRepository.findById(id)).thenReturn(Optional.of(entity));
+
+    assertFalse(toTest.unauthorizedToModify(id, username));
+  }
+
+  @Test
+  void unauthorizedToModifyUserIsContributor() {
+    long id = 1;
+    String username = "contributor";
+
+    UserEntity owner = new UserEntity();
+    owner.setUsername("owner");
+
+    UserEntity contributor = new UserEntity();
+    contributor.setUsername("contributor");
+
+    SavingEntity entity =
+        SavingEntity.builder().owners(List.of(owner)).contributors(List.of(contributor)).build();
+    entity.setId(id);
+
+    when(this.mockSavingsRepository.findById(id)).thenReturn(Optional.of(entity));
+
+    assertTrue(toTest.unauthorizedToModify(id, username));
+  }
+
+  @Test
+  void unauthorizedToModifyUserIsNotOwnerAndIsNotContributor() {
+    long id = 1;
+    String username = "another-user";
+
+    UserEntity owner = new UserEntity();
+    owner.setUsername("owner");
+
+    UserEntity contributor = new UserEntity();
+    contributor.setUsername("contributor");
+
+    SavingEntity entity =
+        SavingEntity.builder().owners(List.of(owner)).contributors(List.of(contributor)).build();
+    entity.setId(id);
+
+    when(this.mockSavingsRepository.findById(id)).thenReturn(Optional.of(entity));
+
+    assertTrue(toTest.unauthorizedToModify(id, username));
+  }
+
+  @Test
+  void getSingleSaving() {
+    long id = 1;
+
+    UserEntity owner = new UserEntity();
+    owner.setUsername("owner");
+
+    UserEntity contributor = new UserEntity();
+    contributor.setUsername("contributor");
+
+    SavingEntity entity =
+        SavingEntity.builder()
+            .amount(BigDecimal.ONE)
+            .owners(List.of(owner))
+            .contributors(List.of(contributor))
+            .build();
+    entity.setId(id);
+
+    when(this.mockSavingsRepository.findById(id)).thenReturn(Optional.of(entity));
+
+    EditSavingDTO actual = toTest.getSingleSaving(id);
+
+    assertEquals(entity.getAmount(), actual.getAmount());
+    assertEquals(entity.getOwners().get(0).getUsername(), actual.getOwners().get(0));
+    assertEquals(entity.getContributors().get(0).getUsername(), actual.getContributors().get(0));
+  }
+
+  @Test
+  void getSingleSavingThrowsException() {
+    long id = 1;
+
+    NoAvailableDataException exception =
+        assertThrows(NoAvailableDataException.class, () -> toTest.getSingleSaving(id));
+
+    assertEquals("Non existent saving", exception.getMessage());
+  }
+
+  @Test
+  void maintenance() {
+    SavingEntity toRemain = SavingEntity.builder()
+            .endDate(LocalDate.now().plusDays(10))
+                                        .build();
+    toRemain.setId(1L);
+
+    SavingEntity forDeletion =
+        SavingEntity.builder()
+                    .goal("test-goal")
+                    .endDate(LocalDate.now())
+            .amount(BigDecimal.TEN)
+            .owners(List.of(new UserEntity()))
+            .build();
+    forDeletion.setId(2L);
+
+    when(mockSavingsRepository.findAll())
+            .thenReturn(List.of(toRemain, forDeletion));
+    when(this.mockSavingsRepository.findById(forDeletion.getId()))
+            .thenReturn(Optional.of(forDeletion));
+
+
+    toTest.maintenance();
+
+    verify(mockSavingsRepository).findAll();
+    verify(mockSavingsRepository).findById(forDeletion.getId());
+    verify(mockIncomeService).createEntityAndSaveIt(any(), any());
+    verify(mockSavingsRepository).deleteById(forDeletion.getId());
+  }
 }
